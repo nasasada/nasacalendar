@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap" rel="stylesheet">
+
+  <title>スマホ用カレンダー</title>
+  <style>
+
+    body {
+      font-family: 'Noto Sans JP', 'Segoe UI', sans-serif;
+      color: #444;
+      margin: 0;
+      padding: 0;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-top: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+    }
+
+
+
+
+    .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    }
+        
+
+
+
+    .weekday-header {
+      background: #f0f0f0;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      height: 30px;       /* ← この行を追加/調整 */
+      line-height: 30px;  /* ← 縦中央揃え */
+      color: #666;
+      border-right: 1px solid #ccc;  /* 右側に縦線 */
+      border-bottom: 1px solid #ccc;
+    }
+
+    .weekday-header.sun {
+    color: rgb(167, 59, 59); /* 赤（日曜） */
+    }
+
+    .weekday-header.sat {
+    color: rgb(59, 59, 136); /* 青（土曜） */
+    }
+
+    .day,
+    .day-header {
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 3px 1px;
+      box-sizing: border-box;
+      height: 160px;
+      overflow-y: auto;
+      font-size: 14px;
+      position: relative;
+    }
+
+    .date-label-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    }
+
+    .date-number {
+    font-weight: bold;
+    font-size: 14px;
+    }
+
+
+
+    .sun {
+      background-color: #ffe5e5;
+    }
+    .sat {
+      background-color: #e5f0ff;
+    }
+    .holiday {
+      background-color: #ffe5e5 !important;
+    }
+    .holiday-label {
+    font-weight: bold;
+    font-size: 13px;
+    color: #d9534f;  /* 赤っぽい色 */
+    margin-left: 4px;
+    }
+
+    .today {
+    background-color: #a4f7fd !important; /* 水色背景 */
+    }
+    .today-label {
+    font-weight: bold;
+    font-size: 13px;
+    color: #003caa;
+    margin-left: 4px;
+    }
+
+
+    .event {
+      font-size: 14px;
+      margin: 2px 0px;
+      padding: 1px 0px;
+      border-radius: 3px;
+      color: white;
+      display: block;
+      white-space: normal;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 100%;
+    }
+
+
+    #prevMonth, #nextMonth {
+      font-size: 20px;      /* 文字を大きく */
+      padding: 8px 20px;   /* ボタンの内側の余白を増やす */
+      min-width: 80px;      /* 幅の最小値 */
+      min-height: 40px;     /* 高さの最小値 */
+      cursor: pointer;      /* ホバー時のカーソル */
+      border-radius: 6px;   /* 角を少し丸く */
+      user-select: none;    /* クリック時に文字選択されない */
+    }
+
+
+    @media screen and (max-width: 600px) {
+    .event {
+      font-size: 10px;
+      margin: 2px 0px;
+      padding: 1px 0px;
+    }
+    
+    .day,
+    .day-header {
+      font-size: 11px; /* 全体的に文字を少し小さく */
+      height: 130px;   /* 高さも少し低くしてスマホに合わせる */
+    }
+    
+    .date-label-wrapper {
+    gap: 1px;  /* ← スマホ時は余白を小さめに */
+    }
+    .weekday-header {
+      font-size: 12px;
+      height: 22px;
+      line-height: 22px;
+    }
+    
+    .holiday-label,
+    .today-label {
+    font-size: 10px;
+    }
+
+  }
+
+
+  </style>
+</head>
+
+
+
+
+
+
+
+<body>
+
+
+    <div class="calendar-header">
+    <button id="prevMonth">前月</button>
+    <h2 id="monthYear"></h2>
+    <button id="nextMonth">翌月</button>
+    </div>
+
+    <div class="calendar">
+        <!-- 曜日ヘッダー -->
+        <div class="weekday-header sun">日</div>
+        <div class="weekday-header">月</div>
+        <div class="weekday-header">火</div>
+        <div class="weekday-header">水</div>
+        <div class="weekday-header">木</div>
+        <div class="weekday-header">金</div>
+        <div class="weekday-header sat">土</div>
+        
+        <!-- ここにJavaScriptで日ごとの.dayが入る -->
+    </div>
+
+
+
+
+
+
+  <script>
+        const now = new Date();
+        let currentYear = now.getFullYear();
+        let currentMonth = now.getMonth(); // 0-11
+
+        const calendarEl = document.querySelector(".calendar");
+
+
+
+
+
+        // カレンダー再描画用
+        async function renderCalendar(year, month) {
+        calendarEl.innerHTML = ""; // 既存クリア
+
+        // 🌟 曜日ヘッダーを追加
+        const weekdays = ["月", "火", "水", "木", "金", "土", "日"];
+        weekdays.forEach((day, index) => {
+            const headerCell = document.createElement("div");
+            headerCell.className = "weekday-header";
+
+            if (index === 6) headerCell.classList.add("sun");  // 日曜
+            if (index === 5) headerCell.classList.add("sat");  // 土曜
+
+            headerCell.textContent = day;
+            calendarEl.appendChild(headerCell);
+        });
+
+        const firstDay = new Date(year, month, 1);
+        const rawStartDay = firstDay.getDay(); // 0=日曜, 1=月曜, ...
+        const startDay = (rawStartDay + 6) % 7; // 月曜=0, 日曜=6 に変換
+
+
+        // 前月の情報
+        const prevMonth = month - 1 < 0 ? 11 : month - 1;
+        const prevYear = month - 1 < 0 ? year - 1 : year;
+        const prevMonthLastDate = new Date(prevYear, prevMonth + 1, 0).getDate();
+
+        // 当月の日数
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+
+        // ヘッダー（月ラベル）更新
+        document.getElementById("monthYear").textContent = `${year}年${month + 1}月`;
+
+
+
+                
+        // 🌟 前月の日付セルを追加（空白ではなく）
+        for (let i = startDay - 1; i >= 0; i--) {
+            const date = new Date(prevYear, prevMonth, prevMonthLastDate - i);
+            const div = document.createElement("div");
+            div.className = "day";
+            div.setAttribute("data-day", formatDateKey(date));
+
+            const dow = date.getDay();
+            if (dow === 0) div.classList.add("sun");
+            if (dow === 6) div.classList.add("sat");
+
+            // 本日判定
+            const now = new Date();
+            const isToday = (
+                date.getFullYear() === now.getFullYear() &&
+                date.getMonth() === now.getMonth() &&
+                date.getDate() === now.getDate()
+            );
+            if (isToday) div.classList.add("today");
+
+            // ラベル表示
+            const dateLabelWrapper = document.createElement("div");
+            dateLabelWrapper.className = "date-label-wrapper";
+
+            const dateNumber = document.createElement("span");
+            dateNumber.className = "date-number";
+            dateNumber.textContent = date.getDate();
+            dateLabelWrapper.appendChild(dateNumber);
+
+            div.appendChild(dateLabelWrapper);
+            calendarEl.appendChild(div);
+        }
+
+
+
+        // 🌟 2. 当月の日付セルを追加
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const div = document.createElement("div");
+            div.className = "day";
+            div.setAttribute("data-day", formatDateKey(date));
+
+            const dow = date.getDay();
+            if (dow === 0) div.classList.add("sun");
+            if (dow === 6) div.classList.add("sat");
+
+            // 本日判定
+            const now = new Date();
+            const isToday =
+                    date.getFullYear() === now.getFullYear() &&
+                    date.getMonth() === now.getMonth() &&
+                    date.getDate() === now.getDate();
+            if (isToday) div.classList.add("today");
+
+            // 日付ラベル・祝日ラベル・本日ラベル用ラッパー
+            const dateLabelWrapper = document.createElement("div");
+            dateLabelWrapper.className = "date-label-wrapper";
+
+            // 日付数字
+            const dateNumber = document.createElement("span");
+            dateNumber.className = "date-number";
+            dateNumber.textContent = day;
+            dateLabelWrapper.appendChild(dateNumber);
+
+            // セルにラベルラッパーを追加
+            div.appendChild(dateLabelWrapper);
+
+
+            calendarEl.appendChild(div);
+        }
+
+        // イベントと祝日を取得・描画
+        const events = await fetchEvents(year, month);
+        renderEvents(events);
+
+        const holidays = await fetchHolidays(year, month);
+        markHolidays(holidays);
+
+
+        // ポップアップのイベントを再登録！
+        addPopupListeners();
+        
+    
+        }
+
+
+
+
+        // 月移動イベント
+        document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentYear, currentMonth);
+        });
+
+        document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+        });
+
+
+
+
+            function linkify(text) {
+            // URLっぽい部分を正規表現で検出し、リンクタグに置き換え
+            const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
+            return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+            }
+
+
+
+
+    
+
+    // カレンダーIDとAPIキー
+    const calendarId = "sadaharuchallenge@gmail.com";
+    const apiKey = "AIzaSyDCdmcXSeIaZTPnSJmNo5B8SdvjRakhF4A";
+    const holidayCalendarId = "japanese__ja@holiday.calendar.google.com";
+
+    // 色ID → CSSカラーの簡易マップ
+    const colorMap = {
+      "1": "#2952A3", // 青
+      "4": "#d94e3b", // ← これが「朱色」！
+      "5": "#FBD75B", // 黄色系
+      "6": "#FF9900", // オレンジ
+      "9": "#4A86E8", // 水色
+      "11": "#A7A7A7", // 灰色
+    };
+
+    async function fetchEvents(year, month) {
+        const startDate = new Date(year, month, -6).toISOString(); // ← 前月の末週開始（約1週間前）
+        const endDate = new Date(year, month + 1, 7).toISOString(); // ← 翌月の頭も少し含む
+
+        const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+            calendarId
+        )}/events?key=${apiKey}&timeMin=${startDate}&timeMax=${endDate}&singleEvents=true&orderBy=startTime`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.items;
+        }
+
+    async function fetchHolidays(year, month) {
+      const startDate = new Date(year, month, 1).toISOString();
+      const endDate = new Date(year, month + 1, 0).toISOString();
+
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+        holidayCalendarId
+      )}/events?key=${apiKey}&timeMin=${startDate}&timeMax=${endDate}&singleEvents=true&orderBy=startTime`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      return data.items;
+    }
+
+    function renderEvents(events) {
+    // 日付ごとにイベントをグループ化
+    const eventsByDay = {};
+
+    events.forEach((event) => {
+        const start = new Date(event.start.date || event.start.dateTime);
+        const day = formatDateKey(start); // ← "YYYY-MM-DD" 形式
+
+        if (!eventsByDay[day]) eventsByDay[day] = [];
+        eventsByDay[day].push(event);
+    });
+
+
+    // 順序付け用の関数（昼→夕方→夜）
+    function getTimeOrder(summary) {
+        if (summary.includes("昼")) return 1;
+        if (summary.includes("夕方")) return 2;
+        if (summary.includes("夜")) return 3;
+        return 4; // その他は後ろ
+    }
+
+    // 各日のセルに対してイベントをソートして追加
+    Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
+        const cell = document.querySelector(`.day[data-day="${day}"]`);
+        if (cell) {
+        // 既存のイベント削除
+        cell.querySelectorAll(".event").forEach(el => el.remove());
+
+        // イベントを「昼→夕方→夜」で並び替え
+        dayEvents.sort((a, b) => getTimeOrder(a.summary) - getTimeOrder(b.summary));
+
+        // 各イベントを表示
+        dayEvents.forEach(event => {
+
+            // タイトルの文字に応じて強制的に colorId を決定
+            let colorId = "1"; // デフォルトを決めておく
+            if (event.summary.includes("休業予定")) {
+            colorId = "11";  // 灰色
+            } else if (event.summary.includes("昼")) {
+            colorId = "6"; // オレンジ
+            } else if (event.summary.includes("夕方")) {
+            colorId = "4"; // 朱色
+            } else if (event.summary.includes("夜")) {
+            colorId = "1";  // 青
+            }
+            
+            
+            const bgColor = colorMap[colorId] || colorMap["1"];  // fallback
+
+            const div = document.createElement("div");
+            div.textContent = event.summary;
+            div.classList.add("event");
+            div.style.backgroundColor = bgColor;
+
+
+
+            // クリック時に詳細ポップアップ表示
+            div.addEventListener("click", () => {
+            const popup = document.getElementById("popup");
+            const overlay = document.getElementById("overlay");
+            const content = document.getElementById("popup-content");
+
+            // 内容例：タイトル + 日付 + 詳細説明（もしあれば）
+            let description = event.description ? linkify(event.description) : "詳細情報はありません。";
+            let start = event.start.dateTime || event.start.date || "";
+            let end = event.end.dateTime || event.end.date || "";
+
+            description = description.normalize("NFC");
+            
+            // 日付フォーマット
+            const formatDate = (dt) => {
+                if (!dt) return "";
+                const d = new Date(dt);
+                return d.toLocaleString("ja-JP", {year:"numeric", month:"long", day:"numeric", weekday:"short"});
+                }
+
+            content.innerHTML = `
+                <p><h3>${formatDate(start)}</h3></p>
+                <p>${description.replace(/(\r\n|\n|\r)/g, "<br>")}</p>
+            `;
+
+            popup.style.display = "block";
+            overlay.style.display = "block";
+            });
+
+
+
+            cell.appendChild(div);
+        });
+        }
+    });
+    }
+
+
+    function formatDateKey(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+        }
+
+    function markHolidays(holidays) {
+      holidays.forEach((holiday) => {
+        const start = new Date(holiday.start.date);
+        const day = formatDateKey(start);
+        const cell = document.querySelector(`.day[data-day="${day}"]`);
+        if (cell) {
+          cell.classList.add("holiday");
+
+     
+        const wrapper = cell.querySelector(".date-label-wrapper");
+        if (wrapper) {
+            // 祝日ラベルを挿入
+            const holidayLabel = document.createElement("span");
+            holidayLabel.className = "holiday-label";
+            holidayLabel.textContent = holiday.summary;
+            wrapper.appendChild(holidayLabel);
+        }
+        }
+    });
+
+    // 本日マークを別処理でラベル追加（祝日と共存可）
+    const todayCell = document.querySelector(".day.today");
+    if (todayCell) {
+        const wrapper = todayCell.querySelector(".date-label-wrapper");
+        if (wrapper && !wrapper.querySelector(".today-label")) {
+        const todayLabel = document.createElement("span");
+        todayLabel.className = "today-label";
+        todayLabel.textContent = "本日";
+        wrapper.appendChild(todayLabel);
+        }
+    }
+    }
+
+
+    function addPopupListeners() {
+    const popupClose = document.getElementById("popup-close");
+    const overlay = document.getElementById("overlay");
+
+    if (popupClose && overlay) {
+        popupClose.addEventListener("click", () => {
+        document.getElementById("popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+        });
+        overlay.addEventListener("click", () => {
+        document.getElementById("popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+        });
+    }
+    }
+
+
+
+
+
+
+    async function initCalendar() {
+        renderCalendar(currentYear, currentMonth);
+
+
+
+       // ポップアップの閉じるボタン・オーバーレイのイベントを登録
+        document.getElementById("popup-close").addEventListener("click", () => {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        });
+        document.getElementById("overlay").addEventListener("click", () => {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        });
+
+    }
+
+        window.changeMonth = function(diff) {
+        currentMonth += diff;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+        };
+
+
+
+
+    initCalendar();
+  </script>
+
+
+    <!-- イベント詳細ポップアップ -->
+    <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform: translate(-50%, -50%);
+    background:#fff; border:1px solid #ccc; padding:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index:1000;text-align: center; width: 50vw; max-height: 80%; overflow:auto;border-radius: 8px;">
+    <button id="popup-close" style="position:absolute; top:8px; right:8px; background:none; border:none; font-size:16px; cursor:pointer;">✖</button>
+    <div id="popup-content"></div>
+    </div>
+
+    <!-- オーバーレイ -->
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:999;"></div>
+
+</body>
+</html>
