@@ -379,9 +379,35 @@ header, main, #popup {
 
 /* レスポンシブ調整 */
 @media(max-width:600px){
+
   .day { min-height: 60px; }
-  #monthYear { font-size: 16px; }
-  .event, .multi-day-event { font-size: 12px; }
+  #monthYear { font-size: 30px; }
+
+
+  /* イベント全体 */
+  .event.has-thumbnail {
+    height: auto;        /* 固定高さを解除 */
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  /* タイトル部分 */
+  .event.has-thumbnail .event-title {
+    font-size: 9px;     /* 小さめ文字 */
+    line-height: 1.2em;
+    max-height: 18px;   /* 2行まで */
+    margin-bottom: 2px;
+  }
+
+  /* サムネ部分 */
+  .event.has-thumbnail .thumbnail,
+  .thumbnail {
+    height: 42px;       /* 残りの高さ */
+    object-fit: cover;
+  }
+
+  /* 祝日名称を小さく */
+  .holiday-label { font-size: 6px; }
 }
 
 
