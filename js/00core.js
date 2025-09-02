@@ -338,7 +338,7 @@ function renderMultiDayEvents(ev) {
 
       band.style.left = left + "px";
       
-      width -= 15;// 右端を15px短くする
+      width -= 12;// 右端を15px短くする
       band.style.width = width + "px";
 
 
@@ -525,15 +525,28 @@ function markToday() {
 // イベントがある週は高さ広め、無ければ狭めに
 function adjustWeekHeights() {
   const weeks = document.querySelectorAll(".calendar-week");
+  const isMobile = window.innerWidth <= 600; // 600px以下はスマホ扱い
   weeks.forEach(week => {
-    const hasSingleEvent = week.querySelector(".event") !== null;      // 単日イベントチェック
-    if (hasSingleEvent) {
-      week.style.minHeight = "160px"; 
+    // 単日イベントのみチェック（帯は含めない）
+    const hasSingleEvent = week.querySelector(".event") !== null;
+    
+    if(hasSingleEvent) {
+      week.style.minHeight = isMobile ? "100px" : "160px"; // イベント週
     } else {
-      week.style.minHeight = "30px"; 
+      week.style.minHeight = isMobile ? "50px" : "80px";   // 単日イベントなし週（帯だけでも低く）
     }
+
+    // 日付セルも同じ高さに
+    week.querySelectorAll('.day').forEach(day => {
+      day.style.minHeight = week.style.minHeight;
+    });
   });
-}   
+}
+
+// ページロード時とリサイズ時に高さを再調整
+window.addEventListener("DOMContentLoaded", adjustWeekHeights);
+window.addEventListener('load', adjustWeekHeights);
+window.addEventListener('resize', adjustWeekHeights);
 
 
 // --- 月移動 ---
