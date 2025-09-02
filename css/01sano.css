@@ -119,7 +119,7 @@ header, main, #popup {
   transition: background 0.2s;
   z-index: 1;
   border-radius: 8px; /* 角丸強化 ← 追加 */
-  background: linear-gradient(135deg, #333, #222); /* 黒系グラデで立体感 ← 追加 */
+  background: linear-gradient(135deg, rgba(148, 148, 148, 0.4), rgba(34, 34, 34, 0.6)); /* 半透明化 */
 }
 
 /* 月に含まれない日（空白セル） */
@@ -179,9 +179,26 @@ header, main, #popup {
 }
 
 /* 土日セル */
-.day.sun { background: linear-gradient(135deg, #e49191ee, #7a2c2cee); } /* ← 追加 */
-.day.sat { background: linear-gradient(135deg, #7d9dd4e7, #234d77e7); } /* ← 追加 */
-.day.holiday { background: linear-gradient(135deg, #e49191ee, #7a2c2cee); }
+.day.sun {
+  background: linear-gradient(135deg,
+    rgba(228, 145, 145, 0.3),   /* #e49191ee → alpha 0.75 */
+    rgba(122, 44, 44, 0.8)        /* #7a2c2cee → alpha 0.8 */
+  );
+}
+
+.day.sat {
+  background: linear-gradient(135deg,
+    rgba(125, 157, 212, 0.3),   /* #7d9dd4e7 → alpha 0.91 */
+    rgba(35, 77, 119, 0.91)      /* #234d77e7 → alpha 0.91 */
+  );
+}
+
+.day.holiday {
+  background: linear-gradient(135deg,
+    rgba(228, 145, 145, 0.3),   /* #e49191ee → alpha 0.75 */
+    rgba(122, 44, 44, 0.8)       /* #7a2c2cee → alpha 0.8 */
+  );
+}
 
 /* カーソル持ってくと */
 .day:hover { 
