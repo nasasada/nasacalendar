@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+
+  <!-- Google Fonts: Playfair Display, Dancing Script, Great Vibes, Pacifico, Lobster -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&family=Dancing+Script&family=Great+Vibes&family=Pacifico&family=Lobster&display=swap" rel="stylesheet">
+
+  <title>ダイスケ・サノ カレンダー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- 共通CSS -->
+  <link rel="stylesheet" href="css/00base.css">
+  <!-- 佐野さん専用CSS -->
+  <link rel="stylesheet" href="css/01sano.css">
+</head>
+<body>
+  <header>
+
+    <div class="calendar-header">
+      <button id="prevMonth">← Last</button>
+      <span id="monthYear"></span>
+      <button id="nextMonth">Next →</button>
+    </div>
+  </header>
+
+  <!-- カレンダー本体 -->
+  <main id="calendar" class="calendar"></main>
+
+  <!-- イベント詳細ポップアップ -->
+  <div id="popup" style="display:none;">
+    <button id="popup-close">✖</button>
+    <div id="popup-content"></div>
+  </div>
+
+  <!-- 背景オーバーレイ -->
+  <div id="overlay" style="display:none;"></div>
+
+  <!-- 共通JS -->
+  <script src="js/00core.js"></script>
+  <!-- 佐野さん専用JS -->
+  <script src="js/01sano.js"></script>
+</body>
+</html>
