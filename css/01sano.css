@@ -28,6 +28,7 @@ header, main, #popup {
   background: linear-gradient(145deg, #331d03, #8b4516); /* ダーク系グラデ ← 追加 */
   border-radius: 8px; /* 角丸 ← 追加 */
   padding: 9px 0; /* 上下余白調整 ← 追加 */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4); /* 影で浮き感追加 ← 追加 */
 }
 
 #monthYear {
@@ -67,11 +68,11 @@ header, main, #popup {
   margin: 2px auto;
 
   /* 半透明に変更 */
-  background-color: rgba(255, 255, 255, 0.1); /* 白50%透過 */
+  background-color: rgba(255, 255, 255, 0.2); /* 白50%透過 */
   backdrop-filter: blur(5px);                 /* 背景を少しぼかす */
 
   /* 背景グラデーション追加 */
-  background: linear-gradient(145deg, rgba(0,0,0,0.2), rgba(30,30,30,0.2)); /* ← 追加 */
+  background: linear-gradient(145deg, rgba(0,0,0,0), rgba(30,30,30,0)); /* ← 追加 */
   box-shadow: 0 8px 20px rgba(0,0,0,0.4); /* 影で浮き感追加 ← 追加 */
   border-radius: 16px; /* 角丸を少し大きくして柔らかさ強化 ← 変更 */
 
@@ -118,13 +119,14 @@ header, main, #popup {
   transition: background 0.2s;
   z-index: 1;
   border-radius: 8px; /* 角丸強化 ← 追加 */
-  background: linear-gradient(135deg, rgba(173, 173, 173, 0.3), rgba(146, 146, 146, 0.3)); /* 黒系グラデを半透明に */
+  background: linear-gradient(135deg, #333, #222); /* 黒系グラデで立体感 ← 追加 */
 }
 
+/* 月に含まれない日（空白セル） */
 .day.other-month {
-  background: rgba(0,0,0,0.1); /* 非表示感の半透明 */
+  background: rgba(247, 247, 247, 0.459); /* ほぼ透過で違和感なく */
+  color: rgba(223, 219, 219, 0.5); /* 日付文字も薄くして馴染ませる */
 }
-
 
 /* 日付ラベル */
 .date-label-wrapper {
