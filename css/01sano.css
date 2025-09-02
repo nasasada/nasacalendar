@@ -1,0 +1,364 @@
+/* 01sano.css - 佐野さん用 黒基調カレンダー */
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: transparent; /* 背景画像を透けさせる */
+  margin: 0;
+  padding: 0;
+  color: #fff;
+}
+
+header, main, #popup {
+  background-color: rgba(255,255,255,0.5);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+
+/* 年月ヘッダー */
+.calendar-header {
+  width: 100%;        /* 横幅を親コンテナいっぱいに */
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin: 1px auto;
+  max-width: 100%;
+  gap: 10px;
+  color: #fff;
+  background: linear-gradient(145deg, #331d03, #8b4516); /* ダーク系グラデ ← 追加 */
+  border-radius: 8px; /* 角丸 ← 追加 */
+  padding: 9px 0; /* 上下余白調整 ← 追加 */
+}
+
+#monthYear {
+  font-size: 25px;          /* 文字サイズ */
+  font-family: 'Lobster', cursive;  /* 英語でも読みやすくおしゃれ */
+  font-weight: bold;        /* 太さ */
+  line-height: 0.7;         /* 縦幅調整 */
+  padding: 6px 0;           /* 上下の余白 */
+  text-align: center;       /* 中央揃え */
+}
+
+/* 前月・翌月ボタン */
+#prevMonth, #nextMonth {
+  font-size: 20px;          /* 文字サイズ */
+  font-family: 'Lobster', cursive;  /* 英語でも読みやすくおしゃれ */
+  padding: 4px 8px;
+  border: none;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(68,68,68,0.6), rgba(34,34,34,0.6)); /* グラデ ← 追加 */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* 影追加 ← 追加 */
+  transition: transform 0.2s, box-shadow 0.2s; /* ホバー演出 ← 追加 */
+}
+#prevMonth:hover, #nextMonth:hover {
+  background: linear-gradient(135deg, #555, #333); /* ホバー時グラデ ← 追加 */
+  transform: translateY(-1px); /* 軽く浮かせる ← 追加 */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.4); /* ホバー時影 ← 追加 */
+}
+
+
+/* カレンダー全体 */
+#calendar {
+  width: 100%;       /* 画面幅いっぱいに */
+  max-width: 100%;   /* 最大幅も制限 */
+  box-sizing: border-box;
+  margin: 2px auto;
+
+  /* 半透明に変更 */
+  background-color: rgba(255, 255, 255, 0.5); /* 白50%透過 */
+  backdrop-filter: blur(5px);                 /* 背景を少しぼかす */
+
+  /* 背景グラデーション追加 */
+  background: linear-gradient(145deg, rgba(0,0,0,0.6), rgba(30,30,30,0.7)); /* ← 追加 */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4); /* 影で浮き感追加 ← 追加 */
+  border-radius: 16px; /* 角丸を少し大きくして柔らかさ強化 ← 変更 */
+
+  display: flex;
+  flex-direction: column;  /* 縦に週ごと並べる */
+  gap: 0;
+
+  border-radius: 12px;      /* 角を丸くして柔らかい印象に */
+  padding: 4px;            /* 内側余白 */
+}
+
+/* 曜日ヘッダー */
+.weekday-header {
+  background: linear-gradient(145deg, #351e02, #723913); /* ダーク系グラデ ← 追加 */
+  text-align: center;
+  padding: 8px 0;
+  font-weight: bold;
+  color: #fff;
+  border-radius: 5px;      /* 角を丸くして柔らかい印象に */
+}
+.weekday-header.sun { color: #be4848ef; }
+.weekday-header.sat { color: #407fbed5; }
+
+
+.calendar-week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  position: relative;
+}
+
+/* 日付セル */
+.day {
+  background: #444; /* 黒系グレー */
+  min-height: 80px;
+  padding: 4px;
+  flex: 1;           /* 均等に幅を割り当て */
+  min-width: 0;      /* 収縮可能に */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  color: #fff;
+  transition: background 0.2s;
+  z-index: 1;
+  border-radius: 8px; /* 角丸強化 ← 追加 */
+  background: linear-gradient(135deg, #333, #222); /* 黒系グラデで立体感 ← 追加 */
+}
+
+
+/* 日付ラベル */
+.date-label-wrapper {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  margin-bottom: 4px;
+  position: relative;
+  z-index: 2;
+}
+
+/* 日付数字 */
+.date-number {
+  font-weight: bold;
+}
+
+/* 祝日ラベル */
+.holiday-label {
+  color: #fae9e9;
+  font-size: 12px;
+}
+
+/* 今日の日付 */
+.day.today {
+  background: linear-gradient(135deg, #87bac7, #15444d)!important; /* 全体と同系の黒系グラデ */
+  border: 2px solid #29b9e9bd; /* 青系アクセント枠は残す */
+  border-radius: 8px;          /* 他のセルと角丸を揃える */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* 浮き感追加 */
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s; /* ホバー演出に対応 */
+}
+
+
+.day.today:hover {
+  background: linear-gradient(135deg, #153526, #8ac0aa)!important; /* hoverでもグラデ維持 */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+/* 今日ラベル */
+.today-label {
+  font-size: 11px;
+  color: #34eba5da; /* 青系アクセント */
+  font-weight: bold;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+}
+
+/* 土日セル */
+.day.sun { background: linear-gradient(135deg, #e49191ee, #7a2c2cee); } /* ← 追加 */
+.day.sat { background: linear-gradient(135deg, #7d9dd4e7, #234d77e7); } /* ← 追加 */
+.day.holiday { background: linear-gradient(135deg, #e49191ee, #7a2c2cee); }
+
+/* カーソル持ってくと */
+.day:hover { 
+    background: linear-gradient(135deg, #303030, #c2c2c2)!important; /* hoverでもグラデ維持 */
+  ; 
+}
+
+/* コンテナ：複数日イベント */
+.multi-day-container {
+  position: relative; /* 子の絶対配置の基準 */
+  height: 0;       /* 帯の高さに合わせる */
+  margin-bottom: 2px; /* 単日イベントとの間隔 */
+}
+.multi-day-container .multi-day-band {
+  position: absolute;
+  top: 0;
+}
+
+/* コンテナ：単日イベント */
+.single-event-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 2;
+}
+
+
+/* 単日イベント */
+.event {
+  font-size: 14px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.2em;
+  background: linear-gradient(135deg, #ff8800, #ffb84d); /* ジャズ系グラデ ← 変更 */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3); /* 少し浮かせる ← 追加 */
+  transition: transform 0.2s, box-shadow 0.2s; /* ホバー時の演出 ← 追加 */
+  position: relative;
+  z-index: 2;
+}
+
+.event:hover {
+  transform: translateY(-2px); /* 浮き演出 ← 追加 */
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4); /* ホバー時の影 ← 追加 */
+}
+
+/* サムネ付きイベント全体を固定高さに */
+.event.has-thumbnail {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 120px;   /* ← 全て同じ高さに統一 */
+  overflow: hidden;
+}
+
+/* タイトル部分：最大2行まで */
+.event.has-thumbnail .event-title {
+  flex: 0 0 auto;
+  max-height: 2.4em;       /* 行高 × 2 */
+  line-height: 1.2em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0px;
+}
+
+/* サムネ部分：高さは残り領域を使う */
+.event.has-thumbnail .thumbnail {
+  flex: 1;
+  height: 70px;            /* 固定でもOK */
+  object-fit: cover;
+  border-radius: 4px;
+  opacity: 0.85;
+}
+
+
+
+/* タイトル：最大2行に制限 */
+.event-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;    /* ← ここで行数指定 */
+  
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2em;
+  max-height: 2.4em;           /* 行高 × 2 */
+  width: 100%;
+}
+
+/* サムネがある場合だけ高さが伸びる */
+.thumbnail {
+  width: 100%;
+  height: 60px;                /* 高さ固定 */
+  object-fit: cover;
+  border-radius: 4px;
+  margin-top: 2px;
+  opacity: 0.85;
+}
+
+/* 複数日イベント帯（週を横断） */
+.multi-day-band {
+  display: block;
+  height: 22px;
+  line-height: 22px;
+  padding: 0 6px;
+  background: rgba(121, 70, 12, 0.774);
+  color: #c4b7a5;
+  font-weight: 600;
+  font-size: 12px;
+  border-radius: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  margin-bottom: 2px;
+  position: absolute; /* 日付ラベル直下に固定 */
+  top: 0;             /* 日付ラベル下に配置 */
+  left: 0;
+  width: 100%;
+  z-index: 3;         /* 単日イベントより前面 */
+  border-radius: 6px; /* 角丸 ← 追加 */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 浮き感追加 ← 追加 */
+}
+
+
+
+/* ポップアップ */
+#popup {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid #555;
+  padding: 16px;
+  z-index: 1000;
+  text-align: center;
+  width: 50vw;
+  max-width: 600px;
+  max-height: 80%;
+  overflow: auto;
+  color: #fff;
+  background: linear-gradient(145deg, #111, #222); /* ダーク系グラデ ← 追加 */
+  border-radius: 12px; /* 角丸強化 ← 変更 */
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5); /* 浮き感強化 ← 追加 */
+}
+
+#popup-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #fff;
+}
+
+#overlay {
+  display: none;
+  position: fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background: rgba(0,0,0,0.5); /* 少し透け感弱めに調整 ← 変更 */
+  z-index: 999;
+}
+
+/* レスポンシブ調整 */
+@media(max-width:600px){
+  .day { min-height: 60px; }
+  #monthYear { font-size: 16px; }
+  .event, .multi-day-event { font-size: 12px; }
+}
+
+
