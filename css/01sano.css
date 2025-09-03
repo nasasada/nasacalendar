@@ -407,7 +407,8 @@ header, main, #popup {
   }
 
   /* 祝日名称を小さく */
-  .holiday-label { font-size: 6px; }
+  .holiday-label { font-size: 5px; }
 }
+
 
 
