@@ -222,7 +222,4 @@ body {
 }
 
 
-@media(max-width:600px){
-  .calendar-week { min-height: auto; }
-  .day { min-height: auto; padding-top: 2px; }
-}
+

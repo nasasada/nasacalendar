@@ -130,11 +130,6 @@ header, main, #popup {
   /*line-height: 1.0;   /* 数字の上下も詰める */
 }
 
-/* 月に含まれない日（空白セル） */
-.day.other-month {
-  background: rgba(247, 247, 247, 0.459); /* ほぼ透過で違和感なく */
-  color: rgba(223, 219, 219, 0.5); /* 日付文字も薄くして馴染ませる */
-}
 
 /* 日付ラベル */
 .date-label-wrapper {
@@ -155,8 +150,11 @@ header, main, #popup {
 
 /* 祝日ラベル */
 .holiday-label {
+  height: 12px!important;             /* 高さ自動調整 */
+  line-height: 13px!important;      /* 行高を自動 */
   color: #fae9e9;
-  font-size: 13px;
+  font-size: 12px;
+  padding: 2px 3px!important;
 }
 
 /* 今日の日付 */
@@ -178,11 +176,13 @@ header, main, #popup {
 
 /* 今日ラベル */
 .today-label {
-  font-size: 12px;
-  color: #34eba5da; /* 青系アクセント */
+  height: 12px!important;             /* 高さ自動調整 */
+  line-height: 11px!important;      /* 行高を自動 */
+  font-size: 13px;
+  padding: 0px 3px!important;
+  color: #80e766; /* 青系アクセント */
   font-weight: bold;
   background: none;
-  padding: 0;
   border-radius: 0;
 }
 
@@ -208,6 +208,12 @@ header, main, #popup {
   );
 }
 
+/* 月に含まれない日（空白セル） */
+.day.other-month {
+  background: rgba(247, 247, 247, 0.459); /* ほぼ透過で違和感なく */
+  color: rgba(223, 219, 219, 0.5); /* 日付文字も薄くして馴染ませる */
+}
+
 /* カーソル持ってくと */
 .day:hover { 
     background: linear-gradient(135deg, #303030, #c2c2c2)!important; /* hoverでもグラデ維持 */
@@ -225,19 +231,12 @@ header, main, #popup {
   top: 0;
 }
 
-/* コンテナ：単日イベント */
-.single-event-container {
-  position: relative;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  z-index: 2;
-}
+
 
 
 /* 単日イベント */
 .event {
+  top: -2px !important;                 /* 日付セル内上部からの間隔 */
   margin-top: 0;      /* 上の余白カット */
   font-size: 14px;
   font-weight: bold;
@@ -245,8 +244,9 @@ header, main, #popup {
   border-radius: 4px;
   color: #fff;
   cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;      /* 改行を有効にする */
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -261,6 +261,19 @@ header, main, #popup {
 .event:hover {
   transform: translateY(-2px); /* 浮き演出 ← 追加 */
   box-shadow: 0 6px 12px rgba(0,0,0,0.4); /* ホバー時の影 ← 追加 */
+}
+
+/* コンテナ：単日イベント */
+.single-event-container {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;      /* 改行を有効にする */
+  gap: 0;
+  z-index: 2;
 }
 
 /* サムネ付きイベント全体を固定高さに */
@@ -293,18 +306,7 @@ header, main, #popup {
 
 
 
-/* タイトル：最大2行に制限 */
-.event-title {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;    /* ← ここで行数指定 */
-  
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.2em;
-  max-height: 2.4em;           /* 行高 × 2 */
-  width: 100%;
-}
+
 
 /* サムネがある場合だけ高さが伸びる */
 .thumbnail {
@@ -314,13 +316,17 @@ header, main, #popup {
   border-radius: 4px;
   margin-top: 0;
   opacity: 0.85;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* 複数日イベント帯（週を横断） */
 .multi-day-band {
   display: block;
-
-  padding: 0 6px;
+  top: 20px !important;                 /* 日付セル内上部からの間隔 */
+  height: 15px!important;             /* 高さ自動調整 */
+  line-height: 17px!important;      /* 行高を自動 */
+  padding: 0px 9px!important;
   background: rgba(121, 70, 12, 0.774);
   color: #c4b7a5;
   font-weight: 600;
@@ -338,8 +344,6 @@ header, main, #popup {
   box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 浮き感追加 ← 追加 */
 }
 
-
-
 /* ポップアップ */
 #popup {
   display: none;
@@ -351,7 +355,7 @@ header, main, #popup {
   padding: 16px;
   z-index: 1000;
   text-align: center;
-  width: 50vw;
+  width: 60vw;
   max-width: 600px;
   max-height: 80%;
   overflow: auto;
@@ -383,11 +387,13 @@ header, main, #popup {
   z-index: 999;
 }
 
+
+
 /* レスポンシブ調整 */
-@media(max-width:600px){
+@media (max-width: 600px) {
 
   .day { 
-    min-height: 0;            /* 高さ制限を外す */
+    min-height: 0px;            /* 高さ制限を外す */
     padding: 2px 0;          /* 上下余白を小さく */
     position: relative;    /* absolute 子を正しく参照 */
   }
@@ -406,10 +412,13 @@ header, main, #popup {
     z-index: 2;
   }
 
-  .event-bar {
-    top: 2px;
-    font-size: 10px; /* スマホ用に少し小さく */
+
+  /* 単日イベント */
+  .event {
+    top: -3px !important;                 /* 日付セル内上部からの間隔 */
+    font-size: 8px;     /* 小さめ文字 */
   }
+
 
   /* イベント全体 */
   .event.has-thumbnail {
@@ -420,10 +429,10 @@ header, main, #popup {
 
   /* タイトル部分 */
   .event.has-thumbnail .event-title {
-    font-size: 9px;     /* 小さめ文字 */
+    font-size: 8px;     /* 小さめ文字 */
     line-height: 1.2em;
-    max-height: 18px;   /* 2行まで */
-    margin-bottom: 2px;
+    max-height: 16px;   /* 2行まで */
+    margin-bottom: 1px;
   }
 
   /* サムネ部分 */
@@ -433,35 +442,47 @@ header, main, #popup {
     object-fit: cover;
   }
 
+
+
   /* 祝日名称を小さく */
   .holiday-label {
-    font-size: 5px;
+    font-size: 5px!important;
+    height: 5px!important;             /* 高さ自動調整 */
+    line-height: 5px!important;      /* 行高を自動 */
     margin-top: 0;              /* 上余白は不要 */
     display: flex;              /* フレックスにする */
     flex-direction: column;     /* 縦方向 */
     justify-content: center;    /* 縦中央寄せ */
-    line-height: 1.1em;         /* 行間調整 */
+    padding: 0px 0px!important;           /* 左右少し狭め */
   }
+
+
+
+
+
 
   /* 複数日イベント帯（週を横断） */
   .multi-day-band {
     margin: 0 ;
-    font-size: 13px;           /* 小さくする */
-    height: 8px;             /* 高さ自動調整 */
-    line-height: 8px;      /* 行高を自動 */
-    top: 0;                 /* 日付数字から少し下に */
-    padding: 0 4px;           /* 左右少し狭め */
+    font-size: 9px!important;           /* 小さくする */
+    height: 13px!important;             /* 高さ自動調整 */
+    line-height: 15px!important;      /* 行高を自動 */
+    top: 16px !important;                 /* 日付セル内上部からの間隔 */
+    padding: 0px 8px!important;           /* 左右少し狭め */
   }
-/* 曜日ヘッダー */
-.weekday-header {
-  padding: 3px 0;/* 上下余白を小さく */
-  font-size: 13px; /* 文字も少し小さく */
-}
 
-/* 今日ラベル */
-.today-label {
-  font-size: 9px;
-}
+
+  /* 曜日ヘッダー */
+  .weekday-header {
+    padding: 3px 0;/* 上下余白を小さく */
+    font-size: 13px; /* 文字も少し小さく */
+  }
+
+  /* 今日ラベル */
+  .today-label {
+    font-size: 9px;
+  }
+
 }
 
 
