@@ -315,8 +315,9 @@ function renderMultiDayEvents(ev) {
       // ★ カッコよくする装飾追加
       // -------------------------
       band.style.position = "absolute";
+      band.style.top = null;              // top指定は消す
       band.style.zIndex = 1000; // 単日イベントより前面
-      band.style.padding = "2px 6px";
+      band.style.padding = "1px 6px";
       band.style.borderRadius = "6px";
       band.style.boxShadow = "0 2px 6px rgba(0,0,0,0.2)";
       band.style.fontWeight = "600";
