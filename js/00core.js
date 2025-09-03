@@ -65,15 +65,15 @@ async function renderCalendar(year, month){
   calendarEl.innerHTML="";
 
   // 曜日ヘッダー
-  const weekdays = ["月","火","水","木","金","土","日"];
+  const weekdays = ["日","月","火","水","木","金","土"];
   const headerRow = document.createElement("div");
   headerRow.className = "weekday-row";
 
   weekdays.forEach((day,i)=>{
     const header = document.createElement("div");
     header.className="weekday-header";
-    if(i===5) header.classList.add("sat");
-    if(i===6) header.classList.add("sun");
+    if(i===6) header.classList.add("sat");
+    if(i===0) header.classList.add("sun");
     header.textContent=day;
     headerRow.appendChild(header);
   });
@@ -81,7 +81,7 @@ async function renderCalendar(year, month){
   calendarEl.appendChild(headerRow);
 
   const firstDay = new Date(year, month, 1);
-  const startDay = (firstDay.getDay() + 6) % 7; // 月曜始まり
+  const startDay = firstDay.getDay(); // 日曜始まり
   const daysInMonth = new Date(year, month+1,0).getDate();
 
   document.getElementById("monthYear").textContent = `${year}.${month+1}`;
@@ -106,8 +106,8 @@ async function renderCalendar(year, month){
     const date = new Date(year, month, d);
     addDayCell(date, false, weekEl);
 
-    // 日曜で週を閉じる
-    if(date.getDay() === 0){
+    // 土曜で週を閉じる
+    if(date.getDay() === 6){
       calendarEl.appendChild(weekEl);
       weekEl = document.createElement("div");
       weekEl.className = "calendar-week";
@@ -315,7 +315,7 @@ function renderMultiDayEvents(ev) {
       // ★ カッコよくする装飾追加
       // -------------------------
       band.style.position = "absolute";
-      band.style.top = null;              // top指定は消す
+      band.style.top = "";              // top指定は消す
       band.style.zIndex = 1000; // 単日イベントより前面
       band.style.padding = "1px 6px";
       band.style.borderRadius = "6px";
@@ -394,13 +394,12 @@ function getWeekElement(date){
   return null;
 }
 
-// 週の開始日(月曜)を返す
+// 週の開始日(日曜)を返す
 function getWeekStartDate(date){
   const day = date.getDay();
-  const diff = (day+6)%7; // 月曜=0
-  const monday = new Date(date);
-  monday.setDate(monday.getDate()-diff);
-  return monday;
+  const sunday = new Date(date);
+  sunday.setDate(sunday.getDate()-day);
+  return sunday;
 }
 
 
