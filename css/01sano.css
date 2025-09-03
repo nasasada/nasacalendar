@@ -436,8 +436,11 @@ header, main, #popup {
   /* 祝日名称を小さく */
   .holiday-label {
     font-size: 5px;
-    margin-top: 1px;  /* 上に少しスペースを作る */
-    align-self: flex-start;  /* 上揃えでも微調整可能 */
+    margin-top: 0;              /* 上余白は不要 */
+    display: flex;              /* フレックスにする */
+    flex-direction: column;     /* 縦方向 */
+    justify-content: center;    /* 縦中央寄せ */
+    line-height: 1.1em;         /* 行間調整 */
   }
 
   /* 複数日イベント帯（週を横断） */
@@ -455,6 +458,5 @@ header, main, #popup {
   font-size: 13px; /* 文字も少し小さく */
 }
 }
-
 
 
