@@ -67,15 +67,16 @@ body {
 .date-label-wrapper {
   display: flex;
   justify-content: flex-start; /* 左寄せ */
-  align-items: center;
-  gap: 4px; /* 要素の間に少し余白 */
-  font-size: 14px;
-  margin-bottom: 2px;
+  align-items: flex-start; /* 上に寄せる */
+  gap: 2px; /* 要素の間に少し余白 */
+  font-size: 13px;
+  margin-bottom: 0;
 }
 
 /* 日付数字 */
 .date-number {
   font-weight: bold;
+  line-height: 1;   /* 数字の上下余白を最小化 */
 }
 
 /* 祝日ラベル */
@@ -134,6 +135,7 @@ body {
 
 /* 複数日イベント用の帯 */
 .event-bar {
+  top: 1px;  /* ← 今より小さくする（例えば 12px とか） */
   position: absolute;
   height: 20px;
   border-radius: 4px;
@@ -217,4 +219,10 @@ body {
   height:100vh;
   background: rgba(0,0,0,0.3);
   z-index: 999;
+}
+
+
+@media(max-width:600px){
+  .calendar-week { min-height: auto; }
+  .day { min-height: auto; padding-top: 2px; }
 }

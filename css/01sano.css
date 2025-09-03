@@ -108,7 +108,8 @@ header, main, #popup {
 .day {
   background: #444; /* 黒系グレー */
   min-height: 80px;
-  padding: 4px;
+  padding: 2px !important;
+  gap: 0 !important; /* flex要素間の余白をゼロに */
   flex: 1;           /* 均等に幅を割り当て */
   min-width: 0;      /* 収縮可能に */
   position: relative;
@@ -120,6 +121,13 @@ header, main, #popup {
   z-index: 1;
   border-radius: 8px; /* 角丸強化 ← 追加 */
   background: linear-gradient(135deg, rgba(148, 148, 148, 0.4), rgba(34, 34, 34, 0.6)); /* 半透明化 */
+}
+.day-number {
+  margin: 1px !important;
+  margin-bottom: 0 !important;   /* 数字とイベントの距離をゼロに */
+  padding-bottom: 0 !important;
+  padding: 2px 3px !important;     /* 左右ちょっとだけ */
+  /*line-height: 1.0;   /* 数字の上下も詰める */
 }
 
 /* 月に含まれない日（空白セル） */
@@ -133,9 +141,9 @@ header, main, #popup {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 4px;
-  font-size: 14px;
-  margin-bottom: 4px;
+  gap: 1px;
+  font-size: 17px;
+  margin-bottom: 0;
   position: relative;
   z-index: 2;
 }
@@ -148,7 +156,7 @@ header, main, #popup {
 /* 祝日ラベル */
 .holiday-label {
   color: #fae9e9;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* 今日の日付 */
@@ -210,7 +218,7 @@ header, main, #popup {
 .multi-day-container {
   position: relative; /* 子の絶対配置の基準 */
   height: 0;       /* 帯の高さに合わせる */
-  margin-bottom: 2px; /* 単日イベントとの間隔 */
+  margin-bottom: 5px; /* 単日イベントとの間隔 */
 }
 .multi-day-container .multi-day-band {
   position: absolute;
@@ -223,13 +231,14 @@ header, main, #popup {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
   z-index: 2;
 }
 
 
 /* 単日イベント */
 .event {
+  margin-top: 0;      /* 上の余白カット */
   font-size: 14px;
   font-weight: bold;
   padding: 2px 4px;
@@ -303,15 +312,14 @@ header, main, #popup {
   height: 60px;                /* 高さ固定 */
   object-fit: cover;
   border-radius: 4px;
-  margin-top: 2px;
+  margin-top: 0;
   opacity: 0.85;
 }
 
 /* 複数日イベント帯（週を横断） */
 .multi-day-band {
   display: block;
-  height: 22px;
-  line-height: 22px;
+
   padding: 0 6px;
   background: rgba(121, 70, 12, 0.774);
   color: #c4b7a5;
@@ -322,9 +330,7 @@ header, main, #popup {
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
-  margin-bottom: 2px;
-  position: absolute; /* 日付ラベル直下に固定 */
-  top: 0;             /* 日付ラベル下に配置 */
+  margin-bottom: 1px;
   left: 0;
   width: 100%;
   z-index: 3;         /* 単日イベントより前面 */
@@ -380,9 +386,30 @@ header, main, #popup {
 /* レスポンシブ調整 */
 @media(max-width:600px){
 
-  .day { min-height: 60px; }
-  #monthYear { font-size: 30px; }
+  .day { 
+    min-height: 0;            /* 高さ制限を外す */
+    padding: 2px 0;          /* 上下余白を小さく */
+    position: relative;    /* absolute 子を正しく参照 */
+  }
 
+  #monthYear { font-size: 30px; }
+  
+  /* 日付ラベル */
+  .date-label-wrapper {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 2px;
+    font-size: 13px;
+    margin-bottom: 0!important;
+    position: relative;
+    z-index: 2;
+  }
+
+  .event-bar {
+    top: 2px;
+    font-size: 10px; /* スマホ用に少し小さく */
+  }
 
   /* イベント全体 */
   .event.has-thumbnail {
@@ -407,8 +434,26 @@ header, main, #popup {
   }
 
   /* 祝日名称を小さく */
-  .holiday-label { font-size: 5px; }
-}
+  .holiday-label {
+    font-size: 6px;
+    margin-top: 1px;  /* 上に少しスペースを作る */
+    align-self: flex-start;  /* 上揃えでも微調整可能 */
+  }
 
+  /* 複数日イベント帯（週を横断） */
+  .multi-day-band {
+    margin: 0 ;
+    font-size: 13px;           /* 小さくする */
+    height: 8px;             /* 高さ自動調整 */
+    line-height: 8px;      /* 行高を自動 */
+    top: 0;                 /* 日付数字から少し下に */
+    padding: 0 4px;           /* 左右少し狭め */
+  }
+/* 曜日ヘッダー */
+.weekday-header {
+  padding: 3px 0;/* 上下余白を小さく */
+  font-size: 13px; /* 文字も少し小さく */
+}
+}
 
 
