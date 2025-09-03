@@ -406,47 +406,45 @@ function getWeekStartDate(date){
 
 
 
-
-
-
-
-// --- イベント本文整形（URLリンク・画像・YouTube埋め込み対応） ---
-// --- イベント本文整形（画像サムネ・URLリンク対応） ---
+// --- イベント本文整形（URLリンク＋画像サムネ対応 完全版 修正版） ---
 function formatEventContent(description) {
   if (!description) return "";
 
   let html = description;
 
-  // --- 画像URLをサムネに置換（クリックで元URLに飛ぶ） ---
+  // --- 画像URLを先にプレースホルダー化 ---
   const imgPlaceholders = [];
-  html = html.replace(/(https?:\/\/\S+\.(?:jpg|jpeg|png|gif|webp))/gi, (match) => {
-    const url = match.trim();
+  html = html.replace(/(https?:\/\/[^\s<>"')]+\.(?:jpg|jpeg|png|gif|webp))/gi, (match) => {
+    const url = match.trim().replace(/["'><]/g, '');
     const placeholder = `%%IMG_PLACEHOLDER_${imgPlaceholders.length}%%`;
-    imgPlaceholders.push(`<div style="text-align:center; margin:6px 0;">
-                            <a href="${url}" target="_blank">
-                              <img src="${url}" style="max-width:90%; height:auto; display:inline-block; border-radius:4px;">
-                            </a>
-                          </div>`);
+    imgPlaceholders.push(`
+      <div style="text-align:center; margin:6px 0;">
+        <a href="${url}" target="_blank" rel="noopener noreferrer">
+          <img src="${url}" style="max-width:90%; height:auto; border-radius:4px;">
+        </a>
+      </div>
+    `);
     return placeholder;
   });
 
-  // --- URLをリンク化（画像は除外済み） ---
-  html = html.replace(/(https?:\/\/[^\s<>"'()]+)/g, (url) => {
-    return `<a href="${url}" target="_blank" style="color:#ffe; text-decoration:underline;">${url}</a>`;
+  // --- URLリンク化（画像プレースホルダーは除外） ---
+  html = html.replace(/(https?:\/\/[^\s<>"')]+)/g, (url) => {
+    if (url.startsWith("%%IMG_PLACEHOLDER_")) return url; // 画像URLは無視
+    const cleanUrl = url.trim().replace(/["'><]/g, '');
+    return `<a href="${cleanUrl}" target="_blank" style="color:#fff9c4; text-decoration:underline;">${cleanUrl}</a>`;
   });
 
   // --- 改行を <br> に変換 ---
-  html = html.replace(/\n/g, "<br>");
+  html = html.replace(/\r?\n/g, "<br>");
 
-  // --- プレースホルダーを元に戻す ---
+  // --- 画像プレースホルダーを元に戻す ---
   imgPlaceholders.forEach((imgHtml, index) => {
     const placeholder = `%%IMG_PLACEHOLDER_${index}%%`;
-    html = html.replace(placeholder, imgHtml);
+    html = html.replaceAll(placeholder, imgHtml);
   });
 
   return html;
 }
-
 
 
 
