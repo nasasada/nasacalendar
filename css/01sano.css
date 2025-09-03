@@ -178,7 +178,7 @@ header, main, #popup {
 
 /* 今日ラベル */
 .today-label {
-  font-size: 11px;
+  font-size: 12px;
   color: #34eba5da; /* 青系アクセント */
   font-weight: bold;
   background: none;
@@ -456,6 +456,11 @@ header, main, #popup {
 .weekday-header {
   padding: 3px 0;/* 上下余白を小さく */
   font-size: 13px; /* 文字も少し小さく */
+}
+
+/* 今日ラベル */
+.today-label {
+  font-size: 9px;
 }
 }
 
