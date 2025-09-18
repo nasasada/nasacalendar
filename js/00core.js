@@ -406,47 +406,81 @@ function getWeekStartDate(date){
 
 
 
-// --- イベント本文整形（URLリンク＋画像サムネ対応 完全版 修正版） ---
+// --- イベント本文整形（安全版：画像埋め込み＋リンク化） ---
 function formatEventContent(description) {
   if (!description) return "";
 
-  let html = description;
+  // DOM に変換
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div>${description}</div>`, "text/html");
+  const container = doc.body.firstChild;
 
-  // --- 画像URLを先にプレースホルダー化 ---
-  const imgPlaceholders = [];
-  html = html.replace(/(https?:\/\/[^\s<>"')]+\.(?:jpg|jpeg|png|gif|webp))/gi, (match) => {
-    const url = match.trim().replace(/["'><]/g, '');
-    const placeholder = `%%IMG_PLACEHOLDER_${imgPlaceholders.length}%%`;
-    imgPlaceholders.push(`
-      <div style="text-align:center; margin:6px 0;">
-        <a href="${url}" target="_blank" rel="noopener noreferrer">
-          <img src="${url}" style="max-width:90%; height:auto; border-radius:4px;">
-        </a>
-      </div>
-    `);
-    return placeholder;
+  // --- aタグの追跡URL修正 ---
+  container.querySelectorAll('a').forEach(a => {
+    try {
+      const url = a.href;
+      const gcalMatch = url.match(/https:\/\/www\.google\.com\/url\?q=([^&]+)/);
+      if (gcalMatch) {
+        a.href = decodeURIComponent(gcalMatch[1]);
+      }
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+    } catch (e) { console.error(e); }
   });
 
-  // --- URLリンク化（画像プレースホルダーは除外） ---
-  html = html.replace(/(https?:\/\/[^\s<>"')]+)/g, (url) => {
-    if (url.startsWith("%%IMG_PLACEHOLDER_")) return url; // 画像URLは無視
-    // Googleカレンダーが変換したURLの場合は元URLを取り出す
-    const gcalMatch = url.match(/https:\/\/www\.google\.com\/url\?q=([^&]+)/);
-    const cleanUrl = gcalMatch ? decodeURIComponent(gcalMatch[1]) : url;
-    return `<a href="${cleanUrl}" target="_blank" style="color:#fff9c4; text-decoration:underline;">${cleanUrl}</a>`;
-  });
+  // --- テキストノードの画像 URL を img に置換、普通の URL はリンク化 ---
+  function walk(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      // 改行も含めて分割
+      const parts = node.textContent.split(/(\r?\n|https?:\/\/[^\s<>"')]+\.(?:jpg|jpeg|png|gif|webp)|https?:\/\/[^\s<>"')]+)/gi);
+      if (parts.length > 1) {
+        const fragment = document.createDocumentFragment();
+        parts.forEach(p => {
+          if (!p) return;
+          if (/^https?:\/\/[^\s<>"')]+\.(?:jpg|jpeg|png|gif|webp)$/i.test(p)) {
+            // 画像URL
+            const div = document.createElement("div");
+            div.style.textAlign = "center";
+            div.style.margin = "6px 0";
+            const a = document.createElement("a");
+            a.href = p;
+            a.target = "_blank";
+            a.rel = "noopener noreferrer";
+            const img = document.createElement("img");
+            img.src = p;
+            img.style.maxWidth = "90%";
+            img.style.height = "auto";
+            img.style.borderRadius = "4px";
+            a.appendChild(img);
+            div.appendChild(a);
+            fragment.appendChild(div);
+          } else if (/^https?:\/\/[^\s<>"')]+/.test(p)) {
+            // 画像以外のURL → リンク化
+            const span = document.createElement("span");
+            span.style.color = "#fff9c4";
+            span.style.textDecoration = "underline";
+            span.style.cursor = "pointer";
+            span.textContent = p;
+            span.onclick = () => window.open(p, "_blank");
+            fragment.appendChild(span);
+          } else if (p === "\n" || p === "\r\n") {
+            // 改行 → <br>
+            fragment.appendChild(document.createElement("br"));
+          } else {
+            fragment.appendChild(document.createTextNode(p));
+          }
+        });
+        node.replaceWith(fragment);
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      Array.from(node.childNodes).forEach(child => walk(child));
+    }
+  }
+  walk(container);
 
-  // --- 改行を <br> に変換 ---
-  html = html.replace(/\r?\n/g, "<br>");
-
-  // --- 画像プレースホルダーを元に戻す ---
-  imgPlaceholders.forEach((imgHtml, index) => {
-    const placeholder = `%%IMG_PLACEHOLDER_${index}%%`;
-    html = html.replaceAll(placeholder, imgHtml);
-  });
-
-  return html;
+  return container.innerHTML;
 }
+
 
 
 
@@ -564,4 +598,5 @@ document.getElementById("nextMonth").addEventListener("click",()=>{ changeMonth(
 window.addEventListener("DOMContentLoaded", async () => {
   await renderCalendar(currentYear, currentMonth);
 });
+
 
