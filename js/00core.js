@@ -430,7 +430,9 @@ function formatEventContent(description) {
   // --- URLリンク化（画像プレースホルダーは除外） ---
   html = html.replace(/(https?:\/\/[^\s<>"')]+)/g, (url) => {
     if (url.startsWith("%%IMG_PLACEHOLDER_")) return url; // 画像URLは無視
-    const cleanUrl = url.trim().replace(/["'><]/g, '');
+    // Googleカレンダーが変換したURLの場合は元URLを取り出す
+    const gcalMatch = url.match(/https:\/\/www\.google\.com\/url\?q=([^&]+)/);
+    const cleanUrl = gcalMatch ? decodeURIComponent(gcalMatch[1]) : url;
     return `<a href="${cleanUrl}" target="_blank" style="color:#fff9c4; text-decoration:underline;">${cleanUrl}</a>`;
   });
 
@@ -562,3 +564,4 @@ document.getElementById("nextMonth").addEventListener("click",()=>{ changeMonth(
 window.addEventListener("DOMContentLoaded", async () => {
   await renderCalendar(currentYear, currentMonth);
 });
+
