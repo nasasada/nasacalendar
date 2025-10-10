@@ -347,7 +347,7 @@ function renderMultiDayEvents(ev) {
 
       // タイトルに応じてグラデーション色分け
       if (ev.summary.includes("東京")) {
-        band.style.background = "linear-gradient(90deg, rgba(153, 30, 8, 0.68), rgba(219, 71, 26, 0.74))";
+        band.style.background = "linear-gradient(90deg, rgba(134, 41, 4, 0.76), rgba(224, 82, 39, 0.53))";
         band.style.color = "#f4e8d0";
       } else if (ev.summary.includes("山梨")) {
         band.style.background = "linear-gradient(90deg, rgba(2, 80, 22, 0.6), rgba(102, 199, 128, 0.6))";
