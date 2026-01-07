@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Old+Mincho&display=swap" rel="stylesheet">
+
+  <link rel="icon" href="nasacale.ico" type="image/x-icon">
+  <link rel="apple-touch-icon" href="nasacale.ico">
+  <meta name="theme-color" content="#ffffff">
+
+  <title>ひだまりキッチンカレンダー</title>
+  <style>
+
+    body {
+      font-family: 'Noto Sans JP', 'Segoe UI', sans-serif;
+      color: #444;
+      margin: 0;
+      padding: 0;
+    }
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      border-top: 1px solid #ccc;
+      border-left: 1px solid #ccc;
+    }
+
+
+
+
+    .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    }
+
+        
+    #monthYear {
+      display: flex;
+      align-items: baseline; /* 文字の下ラインを揃える */
+      gap: 50px;
+    }
+
+    .month-num {
+      font-family: 'Inter', sans-serif;
+      font-size: 50px;
+      font-weight: 1000;
+      position: relative;
+      top: 7px;
+    }
+
+    .month-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      letter-spacing: 0.06em;
+    }
+
+
+
+
+    .weekday-header {
+      font-family: 'Cormorant Garamond', serif;
+      background: #f0f0f0;
+      text-align: center;
+      font-weight: bold;
+      font-size: 16px;
+      height: 30px;       /* ← この行を追加/調整 */
+      line-height: 30px;  /* ← 縦中央揃え */
+      color: #666;
+      border-right: 1px solid #ccc;  /* 右側に縦線 */
+      border-bottom: 1px solid #ccc;
+    }
+
+    .weekday-header.sun {
+    color: rgb(167, 59, 59); /* 赤（日曜） */
+    }
+
+    .weekday-header.sat {
+    color: rgb(59, 59, 136); /* 青（土曜） */
+    }
+
+    .day {
+      min-height: 120px; /* 最低限の高さ */
+      height: auto;      /* 中身に合わせて伸びる */
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 3px 1px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden; /* スクロール無効化 */
+    }
+    .day-header {
+      border-right: 1px solid #ccc;
+      border-bottom: 1px solid #ccc;
+      padding: 3px 1px;
+      box-sizing: border-box;
+      height: 160px;
+      overflow-y: auto;
+      font-size: 14px;
+      position: relative;
+      overflow: hidden; /* スクロール無効化 */
+    }
+
+    .date-label-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    }
+
+    .date-number {
+    font-weight: bold;
+    font-size: 14px;
+    }
+
+
+
+    .sun {
+      background-color: #ffe5e5;
+    }
+    .sat {
+      background-color: #e5f0ff;
+    }
+    .holiday {
+      background-color: #ffe5e5 !important;
+    }
+    .holiday-label {
+    font-weight: bold;
+    font-size: 13px;
+    color: #d9534f;  /* 赤っぽい色 */
+    margin-left: 4px;
+    }
+
+    .today {
+    background-color: #a4f7fd !important; /* 水色背景 */
+    }
+    .today-label {
+    font-weight: bold;
+    font-size: 13px;
+    color: #003caa;
+    margin-left: 4px;
+    }
+
+
+    .event {
+      font-size: 14px;
+      line-height: 1.2;
+      margin: 1px 0px;
+      margin-bottom: 1px; /* 同日内複数イベントの隙間 */
+      padding: 1px 0px;
+      border-radius: 3px;
+      color: white;
+      display: block;
+      white-space: normal;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      max-width: 100%;
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+
+    .closed-day {
+      width: 52px;
+      height: 52px;
+      margin: 12px auto 0;
+      border-radius: 50%;
+      background-color: #f4c20d; /* Googleっぽい黄色 */
+      color: #fff;
+      font-size: 20px;
+      line-height: 52px;
+      text-align: center;
+    }
+
+    .color-1  { background:#1a73e8; } /* 青 */
+    .color-2  { background:#34a853; } /* 緑 */
+    .color-3  { background:#fbbc04; } /* 黄 */
+    .color-4  { background:#ea4335; } /* 赤 */
+    .color-5  { background:#4285f4; } /* 水色 */
+    .color-6  { background:#f0932b; } /* オレンジ */
+    .color-7  { background:#8e24aa; } /* 紫 */
+    .color-8  { background:#9e9e9e; } /* グレー */
+    .color-9  { background:#eb5d8c; } /* ピンク */
+    .color-10 { background:#c05d39; } /* 茶色 */
+
+    .color-11 { background:#0b8043; } /* 濃緑 */
+    .color-12 { background:#c0ca33; } /* 黄緑 */
+    .color-13 { background:#174ea6; } /* 濃青 */
+    .color-14 { background:#b31412; } /* ワイン */
+    .color-15 { background:#00acc1; } /* ターコイズ */
+    .color-16 { background:#212121; } /* 黒 */
+    .color-17 { background:#d7ccc8; } /* ベージュ */
+    .color-18 { background:#1f3a8a; } /* ネイビー */
+    .color-19 { background:#808000; } /* オリーブ */
+    .color-20 { background:#424242; } /* グラファイト */
+
+
+    .thumbnail {
+      width: 94%;
+      aspect-ratio: 2 / 1;
+      object-fit: cover;
+      display: block;
+      margin: 3px auto 3px; /* ← auto が中央寄せ */
+      border-radius: 12px; /*サムネイル画像の丸み*/
+    }
+
+    .event.has-thumbnail {
+      padding-left: 4px;
+      padding-right: 4px;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.13em;   /* ← ここが肝 */
+      padding-bottom: 2px;
+    }
+
+    .event.no-thumbnail {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;   /* 縦中央 */
+      align-items: center;       /* 横中央 */
+      padding: 10px 6px;
+      text-align: center;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.18em;   /* ← ここが肝 */
+      line-height: 1.5;
+      border-radius: 18px;   /* 好みで 12〜18px */
+    }
+
+    .event-time {
+      font-size: 13px;
+      opacity: 0.9;
+      line-height: 1.2;
+    }
+
+    .event-title {
+      font-size: 19px;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
+
+
+    #prevMonth, #nextMonth {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;      /* 文字を大きく */
+      padding: 8px 20px;   /* ボタンの内側の余白を増やす */
+      min-width: 80px;      /* 幅の最小値 */
+      min-height: 40px;     /* 高さの最小値 */
+      cursor: pointer;      /* ホバー時のカーソル */
+      border-radius: 6px;   /* 角を少し丸く */
+      user-select: none;    /* クリック時に文字選択されない */
+    }
+
+
+    @media screen and (max-width: 600px) {
+    .event {
+      font-size: 10px;
+      margin: 2px 0px;
+      padding: 1px 0px;
+    }
+
+    .event-title {
+      font-size: 15px;
+    }
+    
+    .day,
+    .day-header {
+      font-size: 11px; /* 全体的に文字を少し小さく */
+      height: 130px;   /* 高さも少し低くしてスマホに合わせる */
+    }
+    
+    .date-label-wrapper {
+    gap: 1px;  /* ← スマホ時は余白を小さめに */
+    }
+    .weekday-header {
+      font-size: 12px;
+      height: 22px;
+      line-height: 22px;
+    }
+    
+    .holiday-label  {
+    font-size: 7px;
+    }
+
+    .today-label {
+    font-size: 10px;
+    }
+
+  }
+
+
+  </style>
+</head>
+
+
+
+
+
+
+
+<body>
+
+
+    <div class="calendar-header">
+    <button id="prevMonth">Last</button>
+    <h2 id="monthYear"></h2>
+    <button id="nextMonth">Next</button>
+    </div>
+
+    <div class="calendar">
+
+    </div>
+
+
+
+
+
+
+  <script>
+        const now = new Date();
+        let currentYear = now.getFullYear();
+        let currentMonth = now.getMonth(); // 0-11
+
+        const calendarEl = document.querySelector(".calendar");
+
+
+
+
+
+        // カレンダー再描画用
+        async function renderCalendar(year, month) {
+        calendarEl.innerHTML = ""; // 既存クリア
+
+
+
+        // 🌟 曜日ヘッダーを追加
+        const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+        weekdays.forEach((day, index) => {
+            const headerCell = document.createElement("div");
+            headerCell.className = "weekday-header";
+
+            if (index === 6) headerCell.classList.add("sun");  // 日曜
+            if (index === 5) headerCell.classList.add("sat");  // 土曜
+
+            headerCell.textContent = day;
+            calendarEl.appendChild(headerCell);
+        });
+
+        const firstDay = new Date(year, month, 1);
+        const rawStartDay = firstDay.getDay(); // 0=日曜, 1=月曜, ...
+        const startDay = (rawStartDay + 6) % 7; // 月曜=0, 日曜=6 に変換
+
+
+        // 前月の情報
+        const prevMonth = month - 1 < 0 ? 11 : month - 1;
+        const prevYear = month - 1 < 0 ? year - 1 : year;
+        const prevMonthLastDate = new Date(prevYear, prevMonth + 1, 0).getDate();
+
+        // 当月の日数
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+
+        // ヘッダー（月ラベル）更新
+        // 英語の月名
+        const MONTH_NAMES = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+
+        // ヘッダー（月ラベル）更新
+        document.getElementById("monthYear").innerHTML =
+          `<span class="month-num">${month + 1}</span>
+          <span class="month-name">${MONTH_NAMES[month]} ｜ ${year}</span>`;
+          
+          
+                
+        // 🌟 前月の日付セルを追加（空白ではなく）
+        for (let i = startDay - 1; i >= 0; i--) {
+            const date = new Date(prevYear, prevMonth, prevMonthLastDate - i);
+            const div = document.createElement("div");
+            div.className = "day";
+            div.setAttribute("data-day", formatDateKey(date));
+
+            const dow = date.getDay();
+            if (dow === 0) div.classList.add("sun");
+            if (dow === 6) div.classList.add("sat");
+
+            // 本日判定
+            const now = new Date();
+            const isToday = (
+                date.getFullYear() === now.getFullYear() &&
+                date.getMonth() === now.getMonth() &&
+                date.getDate() === now.getDate()
+            );
+            if (isToday) div.classList.add("today");
+
+            // ラベル表示
+            const dateLabelWrapper = document.createElement("div");
+            dateLabelWrapper.className = "date-label-wrapper";
+
+            const dateNumber = document.createElement("span");
+            dateNumber.className = "date-number";
+            dateNumber.textContent = date.getDate();
+            dateLabelWrapper.appendChild(dateNumber);
+
+            div.appendChild(dateLabelWrapper);
+
+            // 🎂 ダブルクリックで特別ポップアップを出す
+            div.addEventListener("dblclick", () => {
+              const clickedDate = formatDateKey(date);  // "YYYY-MM-DD" 形式
+              handleDayDblClick(clickedDate);
+            });
+
+            calendarEl.appendChild(div);
+        }
+
+
+
+        // 🌟 2. 当月の日付セルを追加
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(year, month, day);
+            const div = document.createElement("div");
+            div.className = "day";
+            div.setAttribute("data-day", formatDateKey(date));
+
+            const dow = date.getDay();
+            if (dow === 0) div.classList.add("sun");
+            if (dow === 6) div.classList.add("sat");
+
+            // 本日判定
+            const now = new Date();
+            const isToday =
+                    date.getFullYear() === now.getFullYear() &&
+                    date.getMonth() === now.getMonth() &&
+                    date.getDate() === now.getDate();
+            if (isToday) div.classList.add("today");
+
+            // 日付ラベル・祝日ラベル・本日ラベル用ラッパー
+            const dateLabelWrapper = document.createElement("div");
+            dateLabelWrapper.className = "date-label-wrapper";
+
+            // 日付数字
+            const dateNumber = document.createElement("span");
+            dateNumber.className = "date-number";
+            dateNumber.textContent = day;
+            dateLabelWrapper.appendChild(dateNumber);
+
+            // セルにラベルラッパーを追加
+            div.appendChild(dateLabelWrapper);
+
+            // 🎂 ダブルクリックで特別ポップアップを出す
+            div.addEventListener("dblclick", () => {
+              const clickedDate = formatDateKey(date);  // "YYYY-MM-DD"
+              handleDayDblClick(clickedDate);
+            });
+
+
+            calendarEl.appendChild(div);
+        }
+
+        // イベントと祝日を取得・描画
+        const events = await fetchEvents(year, month);
+        renderEvents(events);
+
+        const holidays = await fetchHolidays(year, month);
+        markHolidays(holidays);
+
+
+
+
+        // ランチ画像更新
+        const lunchImg = document.getElementById("lunch-img");
+        const yearStr = year.toString();
+        const monthStr = (month + 1).toString().padStart(2, "0");
+        
+        // 画像表示をリセット
+        lunchImg.style.display = "block";
+        
+        // 年月に応じた画像URLを生成
+        lunchImg.src = `https://blog-imgs-163.fc2.com/o/k/u/okusawanasa/${yearStr}${monthStr}L.pngtest`;
+
+        // 画像が見つからなければ非表示にする
+        lunchImg.onerror = () => {lunchImg.style.display = "none"}; 
+
+
+
+
+
+
+
+
+
+        // ポップアップのイベントを再登録！
+        addPopupListeners();
+        
+    
+        }
+
+
+
+
+        // 月移動イベント
+        document.getElementById("prevMonth").addEventListener("click", () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        }
+        renderCalendar(currentYear, currentMonth);
+        });
+
+        document.getElementById("nextMonth").addEventListener("click", () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+        });
+
+
+            function escapeHtml(text) {
+              return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+            }
+
+
+            function linkify(text) {
+            // URLっぽい部分を正規表現で検出し、リンクタグに置き換え
+            const urlPattern = /(\bhttps?:\/\/[^\s]+)/g;
+            return text.replace(urlPattern, (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
+            }
+
+
+
+
+    
+
+    // カレンダーIDとAPIキー
+    const calendarId = "sadaharuchallenge@gmail.com";
+    const apiKey = "AIzaSyAF74bBMmb3lHO9t9HKRI0vFQkrC_WrcdY";
+    const holidayCalendarId = "japanese__ja@holiday.calendar.google.com";
+
+
+    async function fetchEvents(year, month) {
+        const startDate = new Date(year, month, -6);
+        const endDate = new Date(year, month + 1, 7);
+
+        // 時刻を1日分きっちり含めるように調整
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
+
+        const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+            calendarId
+        )}/events?key=${apiKey}&timeMin=${startDate.toISOString()}&timeMax=${endDate.toISOString()}&singleEvents=true&orderBy=startTime`;
+
+        const res = await fetch(url);
+        const data = await res.json();
+        return data.items;
+        }
+
+
+    // 除外するイベント名（祝日じゃない行事）
+    const excludeHolidays = [
+      "節分",
+      "雛祭り",
+      "母の日",
+      "七夕",
+      "七五三",
+      "クリスマス",
+      "銀行休業日",
+    ];
+
+    async function fetchHolidays(year, month) {
+      const startDate = new Date(year, month, 1).toISOString();
+      const endDate = new Date(year, month + 1, 0).toISOString();
+
+      const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(
+        holidayCalendarId
+      )}/events?key=${apiKey}&timeMin=${startDate}&timeMax=${endDate}&singleEvents=true&orderBy=startTime`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+
+      // 除外リストに入っていないものだけ返す
+      return data.items.filter(ev => !excludeHolidays.includes(ev.summary));
+    }
+
+    function renderEvents(events) {
+    // 日付ごとにイベントをグループ化
+    const eventsByDay = {};
+
+    events.forEach((event) => {
+        const start = new Date(event.start.date || event.start.dateTime);
+        const day = formatDateKey(start); // ← "YYYY-MM-DD" 形式
+
+        if (!eventsByDay[day]) eventsByDay[day] = [];
+        eventsByDay[day].push(event);
+    });
+
+
+
+    //　タイトルから時間と内容を取得
+    function splitTitle(summary) {
+      if (!summary) return { time: "", title: "" };
+
+      // 「時間 + 全角 or 半角スペース + 内容」
+      const match = summary.match(/^(.+?)\s+(.+)$/);
+
+      if (!match) {
+        return { time: summary, title: "" };
+      }
+
+      return {
+        time: match[1],
+        title: match[2],
+      };
+    }
+
+
+
+    //　タイトルから開始時間取得（ソートの為）
+    function extractStartTime(summary) {
+      if (!summary) return 9999;
+
+      // 例:
+      // 16~19時
+      // 17:30~
+      // 9~
+      const match = summary.match(/^(\d{1,2})(?::(\d{2}))?/);
+
+      if (!match) return 9999;
+
+      const hour = parseInt(match[1], 10);
+      const minute = match[2] ? parseInt(match[2], 10) : 0;
+
+      return hour * 60 + minute; // 分単位で返す
+    }
+
+
+
+    // 各日のセルに対してイベントをソートして追加
+    Object.entries(eventsByDay).forEach(([day, dayEvents]) => {
+        const cell = document.querySelector(`.day[data-day="${day}"]`);
+        if (cell) {
+        // 既存のイベント削除
+        cell.querySelectorAll(".event").forEach(el => el.remove());
+
+
+
+        // イベントを「時間」で並び替え
+        dayEvents.sort(
+                        (a, b) =>
+                          extractStartTime(a.summary) - extractStartTime(b.summary)
+                      );
+
+        // 各イベントを表示
+        dayEvents.forEach(event => {
+
+            // イベントを表示
+            const div = document.createElement("div");
+            div.classList.add("event");
+
+
+
+
+            // 説明欄の [COLOR:x] を使う
+            const colorId = extractColorId(event); // ← ここが変更点
+            div.classList.add(`color-${colorId}`);
+
+            div.textContent = event.summary;
+
+
+              // 🌟 サムネイル処理
+            const thumbUrl = extractThumbnailUrl(event);
+            if (thumbUrl) {
+              // ===== サムネあり：従来表示 =====
+              div.textContent = event.summary;
+
+              const img = document.createElement("img");
+              img.src = thumbUrl;
+              img.className = "thumbnail";
+              div.appendChild(img);
+
+              div.classList.add("has-thumbnail");
+
+            } else {
+              // ===== サムネなし：2行レイアウト =====
+              const { time, title } = splitTitle(event.summary);
+
+              div.classList.add("no-thumbnail");
+
+              div.innerHTML = `
+                <div class="event-time">${time}</div>
+                <div class="event-title">${title}</div>
+              `;
+            }
+            
+
+            // クリック時に詳細ポップアップ表示
+            div.addEventListener("click", () => {
+            const popup = document.getElementById("popup");
+            const overlay = document.getElementById("overlay");
+            const content = document.getElementById("popup-content");
+            content.innerHTML = "";
+
+            // 内容例：タイトル + 日付 + 詳細説明（もしあれば）
+            let description = event.description
+              ? stripMetaTags(event.description)
+              : "詳細情報はありません。";
+
+            // FC2画像URLの抽出
+            let imageUrls = extractImageUrls(description);
+
+            // 重複除去
+            imageUrls = [...new Set(imageUrls)];
+
+            let imageHtml = "";
+            
+            if (imageUrls.length > 0) {
+               imageUrls.forEach(url => {
+                // <a>〜</a> で囲まれてるものごと削除
+                const urlPattern = new RegExp(`<a[^>]*>${url.replace(/\//g, "\\/")}</a>`, "g");
+                description = description.replace(urlPattern, "");
+                // 念のため生のURLも削除
+                description = description.replace(url, "");
+              });
+
+                // 次に HTML に画像を追加
+                imageHtml = imageUrls.map(url => `
+                  <a href="${url}" target="_blank" rel="noopener noreferrer">
+                    <img src="${url}" alt="イベント画像" style="width:75%; margin-top:10px; border-radius:8px;">
+                  </a>
+                `).join("");
+              }
+
+
+            // 画像URLを除外してリンク化
+            const formattedDescription = description
+              .split('\n')  // 行単位で分割（改行を保持）
+              .map(line => {
+                return line
+                  .split(/(\s+)/)  // 空白を含めて分割（→空白を維持）
+                  .map(part => {
+                    // URLならリンクに（画像URLは除外）
+                    if (/^https?:\/\/[^\s<>"']+$/.test(part)) {
+                      return imageUrls.includes(part)
+                        ? ""  // 画像URLは無視
+                        : `<a href="${part}" target="_blank" rel="noopener noreferrer">${part}</a>`;
+                    } else {
+                      return part;
+                    }
+                  })
+                  .join('');
+              })
+              .join('<br>');
+
+
+
+            const start = event.start.dateTime || event.start.date || "";
+
+            
+            
+            // 日付フォーマット
+            const formatDate = (dt) => {
+                if (!dt) return "";
+                const d = new Date(dt);
+                return d.toLocaleString("ja-JP", {year:"numeric", month:"long", day:"numeric", weekday:"short"});
+                }
+
+            content.innerHTML = `
+              <p><h3>${formatDate(start)}</h3></p>
+              <div style="font-size: 16px; line-height: 1.5;">${formattedDescription}</div>
+              ${imageHtml}
+            `;
+
+            popup.style.display = "block";
+            overlay.style.display = "block";
+            });
+
+
+
+            cell.appendChild(div);
+        });
+        }
+    });
+
+
+
+    // 🌟 イベントが1件も無い日 → 休マーク（全日付対象）
+    document.querySelectorAll(".day").forEach(cell => {
+      const hasEvent = cell.querySelector(".event");
+      const hasClosed = cell.querySelector(".closed-day");
+
+      if (!hasEvent && !hasClosed) {
+        const div = document.createElement("div");
+        div.classList.add("closed-day");
+        div.textContent = "休";
+        cell.appendChild(div);
+      }
+    });
+
+
+
+    // 全セルのイベントを調整して均等に収める
+    document.querySelectorAll(".day").forEach(adjustCellEvents);
+
+
+    }
+
+
+
+    
+    //均等割り付け発動
+    function adjustCellEvents(cell) {
+      const events = cell.querySelectorAll(".event:not(.has-thumbnail):not(.no-thumbnail)");
+      if (events.length === 0) return;
+
+      // 一度すべてのイベントを初期状態に戻す
+      events.forEach(event => {
+        const fullText = event.dataset.fullText || event.textContent;
+        event.dataset.fullText = fullText;
+        event.textContent = fullText;
+
+        // スタイル初期化
+        event.style.height = "";
+        event.style.lineHeight = "";
+        event.style.whiteSpace = "";
+        event.style.overflow = "";
+        event.style.textOverflow = "";
+        event.style.display = "";
+        event.style.webkitLineClamp = "";
+        event.style.webkitBoxOrient = "";
+      });
+
+      // イベントをすべて表示してから、オーバーフロー判定
+      const isOverflowing = cell.scrollHeight > cell.clientHeight;
+
+      if (!isOverflowing) {
+        // 文字切れがないなら、なにもせず自然表示
+        return;
+      }
+
+      // ↓ここから「詰まってる時」だけ発動
+
+      const labelWrapper = cell.querySelector(".date-label-wrapper");
+      const labelHeight = labelWrapper ? labelWrapper.getBoundingClientRect().height : 0;
+      const cellHeight = cell.getBoundingClientRect().height;
+      const availableHeight = cellHeight - labelHeight;
+      const safeHeight = availableHeight - 2;
+      const eventHeight = Math.floor(safeHeight / events.length);
+
+
+      events.forEach(event => {
+        const fullText = event.dataset.fullText;
+        event.textContent = fullText; // 省略せず全文
+
+        // 一時的に高さを自動にして、scrollHeight を計測
+        event.style.height = "auto";
+        event.style.display = "block"; // 一時的に通常ブロック表示
+        const requiredHeight = event.scrollHeight;
+
+        if (requiredHeight > eventHeight) {
+          // ⛔ 均等幅に収める必要あり
+          event.style.height = `${eventHeight}px`;
+          event.style.lineHeight = "1.2em";
+          event.style.whiteSpace = "normal";
+          event.style.overflow = "hidden";
+          event.style.textOverflow = "ellipsis";
+          event.style.display = "-webkit-box";
+          event.style.webkitBoxOrient = "vertical";
+          event.style.webkitLineClamp = Math.floor(eventHeight / 16);
+        } else {
+          // ✅ 高さ足りてるので自然表示（最小限の折り返し対応だけ入れる）
+          event.style.height = "auto";
+          event.style.whiteSpace = "normal";
+          event.style.overflow = "hidden";
+          event.style.textOverflow = "ellipsis";
+          event.style.display = "block";
+        }
+      });
+    }
+
+
+
+
+
+
+
+
+    // 複数のFC2画像URLを抽出する関数
+    function extractImageUrls(text) {
+      const regex = /https?:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|gif)/gi;
+      return text.match(regex) || [];
+    }
+
+
+
+    function formatDateKey(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}`;
+        }
+
+    function markHolidays(holidays) {
+      holidays.forEach((holiday) => {
+        const start = new Date(holiday.start.date);
+        const day = formatDateKey(start);
+        const cell = document.querySelector(`.day[data-day="${day}"]`);
+        if (cell) {
+          cell.classList.add("holiday");
+
+     
+        const wrapper = cell.querySelector(".date-label-wrapper");
+        if (wrapper) {
+            // 祝日ラベルを挿入
+            const holidayLabel = document.createElement("span");
+            holidayLabel.className = "holiday-label";
+            holidayLabel.textContent = holiday.summary;
+            wrapper.appendChild(holidayLabel);
+        }
+        }
+    });
+
+    // 本日マークを別処理でラベル追加（祝日と共存可）
+    const todayCell = document.querySelector(".day.today");
+    if (todayCell) {
+        const wrapper = todayCell.querySelector(".date-label-wrapper");
+        if (wrapper && !wrapper.querySelector(".today-label")) {
+        const todayLabel = document.createElement("span");
+        todayLabel.className = "today-label";
+        todayLabel.textContent = "本日";
+        wrapper.appendChild(todayLabel);
+        }
+    }
+    }
+
+
+    function addPopupListeners() {
+    const popupClose = document.getElementById("popup-close");
+    const overlay = document.getElementById("overlay");
+
+    if (popupClose && overlay) {
+        popupClose.addEventListener("click", () => {
+        document.getElementById("popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+        });
+        overlay.addEventListener("click", () => {
+        document.getElementById("popup").style.display = "none";
+        document.getElementById("overlay").style.display = "none";
+        });
+    }
+    }
+
+
+
+
+
+
+    async function initCalendar() {
+        renderCalendar(currentYear, currentMonth);
+
+
+
+       // ポップアップの閉じるボタン・オーバーレイのイベントを登録
+        document.getElementById("popup-close").addEventListener("click", () => {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("popup-content").innerHTML = "";
+        });
+        document.getElementById("overlay").addEventListener("click", () => {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+            document.getElementById("popup-content").innerHTML = "";
+        });
+
+    }
+
+        window.changeMonth = function(diff) {
+        currentMonth += diff;
+        if (currentMonth < 0) {
+            currentMonth = 11;
+            currentYear--;
+        } else if (currentMonth > 11) {
+            currentMonth = 0;
+            currentYear++;
+        }
+        renderCalendar(currentYear, currentMonth);
+        };
+
+
+
+
+    initCalendar();
+
+
+
+
+    const handleDayDblClick = (date) => {
+      const birthday = new Date("2025-09-27");
+      const clickedDate = new Date(date);
+      if (
+        clickedDate.getFullYear() === birthday.getFullYear() &&
+        clickedDate.getMonth() === birthday.getMonth() &&
+        clickedDate.getDate() === birthday.getDate()
+      ) {
+        showSpecialBirthdayPopup();
+      } else {
+        // 通常のダブルクリック処理（あれば）
+      }
+    };
+
+
+    function showSpecialBirthdayPopup() {
+      const popup = document.createElement("div");
+      popup.style.position = "fixed";
+      popup.style.top = "50%";
+      popup.style.left = "50%";
+      popup.style.transform = "translate(-50%, -50%)";
+      popup.style.padding = "20px";
+      popup.style.background = "white";
+      popup.style.border = "2px solid black";
+      popup.style.zIndex = 9999;
+
+      // YouTube埋め込み
+      popup.innerHTML = `
+        <h2>9/27はサダの誕生日でっせ</h2>
+        <p></p>
+        <iframe width="360" height="215" src="https://www.youtube.com/embed/fFwrmTvZmoY" 
+          frameborder="0" allowfullscreen></iframe>
+        <br><br>
+        <button onclick="this.parentElement.remove()">閉じる</button>
+      `;
+
+      document.body.appendChild(popup);
+    }
+
+    function normalizeDescription(text) {
+      if (!text) return "";
+
+      return text
+        .replace(/<br\s*\/?>/gi, "\n")     // <br> → 改行
+        .replace(/<[^>]+>/g, "")           // ← ★HTMLタグ全部除去
+        .replace(/\u200b/g, "")             // ゼロ幅スペース
+        .replace(/：/g, ":")                // 全角コロン
+        .replace(/[［【]/g, "[")
+        .replace(/[］】]/g, "]")
+        .replace(/\r\n/g, "\n")
+        .trim();
+    }
+
+    function extractColorId(event) {
+      if (!event.description) return "1";
+
+      const text = normalizeDescription(event.description);
+      const match = text.match(/\[COLOR\s*[:=]\s*(\d{1,2})\]/i);
+      return match ? match[1] : "1";
+    }
+
+    function extractThumbnailUrl(event) {
+      if (!event.description) return null;
+
+      const text = normalizeDescription(event.description);
+
+      const match = text.match(
+        /\[THUMB\s*[:=]\s*(https?:\/\/[^\]\n]+)\]/i
+      );
+
+      return match ? match[1] : null;
+    }
+
+    function stripMetaTags(text) {
+      return text
+        .replace(/\[COLOR[:=]\s*\d{1,2}\]/gi, "")
+        .replace(/\[THUMB[:=]\s*[^\]\r\n]+\]/gi, "")
+        .trim();
+    }
+
+  </script>
+
+
+    <!-- イベント詳細ポップアップ -->
+    <div id="popup" style="display:none; position:fixed; top:50%; left:50%; transform: translate(-50%, -50%);
+    background:#fff; border:1px solid #ccc; padding:16px; box-shadow: 0 2px 10px rgba(0,0,0,0.3); z-index:1000;text-align: center; width: 50vw; max-width: 600px; max-height: 80%; overflow:auto;border-radius: 8px;">
+    <button id="popup-close" style="position:absolute; top:8px; right:8px; background:none; border:none; font-size:16px; cursor:pointer;">✖</button>
+    <div id="popup-content"></div>
+    </div>
+
+    <!-- オーバーレイ -->
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); z-index:999;"></div>
+
+    <BR>
+
+<!-- 注意書き -->
+<div style="text-align:center; margin: 1.5em auto; padding: 1.2em; 
+            background:#fff3cd; border:1px solid #ffecb5; 
+            border-radius:8px; max-width:700px; 
+            box-shadow:0 2px 6px rgba(0,0,0,0.15);">
+  <p style="margin:0; font-weight:bold; color:#664d03; font-size:1.2em;">
+    ⚠️ 文章やリンク配置できます！
+  </p>
+  <p style="margin:0.5em 0 0;font-size:1.2em;">
+    <a href="https://www.nasaspace.at/schedule/bar/" target="_blank" 
+       style="color:#0d6efd; font-weight:bold; text-decoration:underline;">
+       詳しくはコチラ
+    </a>
+  </p>
+</div>
+
+    <BR>
+      
+    <!-- ランチ営業予定 -->
+    <img id="lunch-img"
+          src=""
+          alt="ランチ営業予定"
+          style="max-width:70%; height:auto; display:block; margin:0 auto;">
+
+</body>
+</html>
