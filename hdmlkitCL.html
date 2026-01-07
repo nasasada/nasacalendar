@@ -272,7 +272,18 @@
       font-size: 15px;
     }
     
-    .day,
+    .month-num {
+      font-size: 10px;
+    }
+    .month-name {
+      font-size: 8px;
+    }
+
+    .day {
+      min-height: 30px; /* 最低限の高さ */
+      height: auto;      /* 中身に合わせて伸びる */
+    }
+
     .day-header {
       font-size: 11px; /* 全体的に文字を少し小さく */
       height: 130px;   /* 高さも少し低くしてスマホに合わせる */
@@ -294,6 +305,62 @@
     .today-label {
     font-size: 10px;
     }
+
+    .closed-day {
+      width: 20px;
+      height: 20px;
+      margin: 2px auto 0;
+      border-radius: 50%;
+      font-size: 10px;
+      line-height: 10px;
+    }
+
+
+    .thumbnail {
+      width: 94%;
+      aspect-ratio: 2 / 1;
+      object-fit: cover;
+      display: block;
+      margin: 3px auto 3px; /* ← auto が中央寄せ */
+      border-radius: 12px; /*サムネイル画像の丸み*/
+    }
+
+    .event.has-thumbnail {
+      padding-left: 4px;
+      padding-right: 4px;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 7px;
+      letter-spacing: 0.13em;   /* ← ここが肝 */
+      padding-bottom: 2px;
+    }
+
+    .event.no-thumbnail {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;   /* 縦中央 */
+      align-items: center;       /* 横中央 */
+      padding: 10px 6px;
+      text-align: center;
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      font-size: 5px;
+      font-weight: 500;
+      letter-spacing: 0.18em;   /* ← ここが肝 */
+      line-height: 1.5;
+      border-radius: 18px;   /* 好みで 12〜18px */
+    }
+
+    .event-time {
+      font-size: 5px;
+      opacity: 0.9;
+      line-height: 1.2;
+    }
+
+    .event-title {
+      font-size: 8px;
+      line-height: 1.3;
+      margin-top: 2px;
+    }
+
 
   }
 
