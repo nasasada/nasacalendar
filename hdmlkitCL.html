@@ -208,7 +208,7 @@
 
     .thumbnail {
       width: 94%;
-      aspect-ratio: 2 / 1;
+      aspect-ratio: 1 / 1; /*正方形*/
       object-fit: cover;
       display: block;
       margin: 3px auto 3px; /* ← auto が中央寄せ */
@@ -1167,31 +1167,34 @@
     function normalizeThumbUrl(url) {
       if (!url) return null;
 
-      // drive.google.com/file/d/xxxxx/view
-      let m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+      let m;
+
+      // drive.google.com/file/d/ID/view
+      m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
       if (m) {
-        return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+        return `https://drive.google.com/uc?id=${m[1]}`;
       }
 
-      // drive.google.com/open?id=xxxxx
-      m = url.match(/open\?id=([^&]+)/);
+      // drive.google.com/open?id=ID
+      m = url.match(/drive\.google\.com\/open\?id=([^&]+)/);
       if (m) {
-        return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+        return `https://drive.google.com/uc?id=${m[1]}`;
       }
 
-      // drive.usercontent.google.com/download?id=xxxxx
-      m = url.match(/download\?id=([^&]+)/);
+      // drive.usercontent.google.com/download?id=ID
+      m = url.match(/id=([^&]+)/);
       if (m) {
-        return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+        return `https://drive.google.com/uc?id=${m[1]}`;
       }
 
-      // すでに uc?export=view ならそのまま
-      if (url.includes("drive.google.com/uc?")) {
+      // すでに uc?id=
+      if (url.includes("drive.google.com/uc?id=")) {
         return url;
       }
 
-      return url; // その他（GitHub raw等）
+      return url; // GitHub raw 等
     }
+
 
 
 
