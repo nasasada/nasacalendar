@@ -627,6 +627,41 @@
     const apiKey = "AIzaSyAF74bBMmb3lHO9t9HKRI0vFQkrC_WrcdY";
     const holidayCalendarId = "japanese__ja@holiday.calendar.google.com";
 
+    function normalizeDescription(text) {
+      if (!text) return "";
+
+      return text
+        .replace(/<br\s*\/?>/gi, "\n")     // <br> → 改行
+        .replace(/<[^>]+>/g, "")           // ← ★HTMLタグ全部除去
+        .replace(/\u200b/g, "")             // ゼロ幅スペース
+        .replace(/：/g, ":")                // 全角コロン
+        .replace(/[［【]/g, "[")
+        .replace(/[］】]/g, "]")
+        .replace(/\r\n/g, "\n")
+        .trim();
+    }
+
+    function extractColorId(event) {
+      if (!event.description) return "1";
+
+      const text = normalizeDescription(event.description);
+      const match = text.match(/\[COLOR\s*[:=]\s*(\d{1,2})\]/i);
+      return match ? match[1] : "1";
+    }
+
+    function extractThumbnailUrl(event) {
+      if (!event.description) return null;
+
+      const text = normalizeDescription(event.description);
+
+      const match = text.match(
+        /\[THUMB\s*[:=]\s*(https?:\/\/[^\]\n]+)\]/i
+      );
+
+      return match ? match[1] : null;
+    }
+
+
 
     async function fetchEvents(year, month) {
         const startDate = new Date(year, month, -6);
@@ -758,24 +793,22 @@
 
 
               // 🌟 サムネイル処理
-            const thumbUrl = extractThumbnailUrl(event);
+            const rawThumb = extractThumbnailUrl(event);
+            const thumbUrl = rawThumb ? normalizeThumbUrl(rawThumb) : null;
+
             if (thumbUrl) {
               // ===== サムネあり：従来表示 =====
               div.textContent = event.summary;
-
               const img = document.createElement("img");
               img.src = thumbUrl;
               img.className = "thumbnail";
               div.appendChild(img);
-
               div.classList.add("has-thumbnail");
 
             } else {
               // ===== サムネなし：2行レイアウト =====
               const { time, title } = splitTitle(event.summary);
-
               div.classList.add("no-thumbnail");
-
               div.innerHTML = `
                 <div class="event-time">${time}</div>
                 <div class="event-title">${title}</div>
@@ -1122,39 +1155,7 @@
       document.body.appendChild(popup);
     }
 
-    function normalizeDescription(text) {
-      if (!text) return "";
-
-      return text
-        .replace(/<br\s*\/?>/gi, "\n")     // <br> → 改行
-        .replace(/<[^>]+>/g, "")           // ← ★HTMLタグ全部除去
-        .replace(/\u200b/g, "")             // ゼロ幅スペース
-        .replace(/：/g, ":")                // 全角コロン
-        .replace(/[［【]/g, "[")
-        .replace(/[］】]/g, "]")
-        .replace(/\r\n/g, "\n")
-        .trim();
-    }
-
-    function extractColorId(event) {
-      if (!event.description) return "1";
-
-      const text = normalizeDescription(event.description);
-      const match = text.match(/\[COLOR\s*[:=]\s*(\d{1,2})\]/i);
-      return match ? match[1] : "1";
-    }
-
-    function extractThumbnailUrl(event) {
-      if (!event.description) return null;
-
-      const text = normalizeDescription(event.description);
-
-      const match = text.match(
-        /\[THUMB\s*[:=]\s*(https?:\/\/[^\]\n]+)\]/i
-      );
-
-      return match ? match[1] : null;
-    }
+    
 
     function stripMetaTags(text) {
       return text
@@ -1162,6 +1163,38 @@
         .replace(/\[THUMB[:=]\s*[^\]\r\n]+\]/gi, "")
         .trim();
     }
+
+    function normalizeThumbUrl(url) {
+      if (!url) return null;
+
+      // drive.google.com/file/d/xxxxx/view
+      let m = url.match(/drive\.google\.com\/file\/d\/([^/]+)/);
+      if (m) {
+        return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+      }
+
+      // drive.google.com/open?id=xxxxx
+      m = url.match(/open\?id=([^&]+)/);
+      if (m) {
+        return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+      }
+
+      // drive.usercontent.google.com/download?id=xxxxx
+      m = url.match(/download\?id=([^&]+)/);
+      if (m) {
+        return `https://drive.google.com/uc?export=view&id=${m[1]}`;
+      }
+
+      // すでに uc?export=view ならそのまま
+      if (url.includes("drive.google.com/uc?")) {
+        return url;
+      }
+
+      return url; // その他（GitHub raw等）
+    }
+
+
+
 
   </script>
 
