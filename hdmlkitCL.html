@@ -469,44 +469,11 @@
           
           
                 
-        // 🌟 前月の日付セルを追加（空白ではなく）
-        for (let i = startDay - 1; i >= 0; i--) {
-            const date = new Date(prevYear, prevMonth, prevMonthLastDate - i);
-            const div = document.createElement("div");
-            div.className = "day";
-            div.setAttribute("data-day", formatDateKey(date));
-
-            const dow = date.getDay();
-            if (dow === 0) div.classList.add("sun");
-            if (dow === 6) div.classList.add("sat");
-
-            // 本日判定
-            const now = new Date();
-            const isToday = (
-                date.getFullYear() === now.getFullYear() &&
-                date.getMonth() === now.getMonth() &&
-                date.getDate() === now.getDate()
-            );
-            if (isToday) div.classList.add("today");
-
-            // ラベル表示
-            const dateLabelWrapper = document.createElement("div");
-            dateLabelWrapper.className = "date-label-wrapper";
-
-            const dateNumber = document.createElement("span");
-            dateNumber.className = "date-number";
-            dateNumber.textContent = date.getDate();
-            dateLabelWrapper.appendChild(dateNumber);
-
-            div.appendChild(dateLabelWrapper);
-
-            // 🎂 ダブルクリックで特別ポップアップを出す
-            div.addEventListener("dblclick", () => {
-              const clickedDate = formatDateKey(date);  // "YYYY-MM-DD" 形式
-              handleDayDblClick(clickedDate);
-            });
-
-            calendarEl.appendChild(div);
+        // 🌟 前月分は「空セル」で埋める
+        for (let i = 0; i < startDay; i++) {
+          const div = document.createElement("div");
+          div.className = "day empty";
+          calendarEl.appendChild(div);
         }
 
 
@@ -919,6 +886,10 @@
 
     // 🌟 イベントが1件も無い日 → 休マーク（全日付対象）
     document.querySelectorAll(".day").forEach(cell => {
+
+       // 👇 空セルはスキップ
+      if (cell.classList.contains("empty")) return;
+
       const hasEvent = cell.querySelector(".event");
       const hasClosed = cell.querySelector(".closed-day");
 
